@@ -176,8 +176,32 @@ h1{font-family:'Barlow Condensed';font-weight:700;font-size:30px;letter-spacing:
 .part .pi span{font-size:11px;color:var(--gris)}
 .alert-planning{margin-top:14px;background:var(--ambre-pale);border:1px solid #F0DCA8;border-radius:8px;padding:10px 12px;font-size:12px;color:#7A5503;line-height:1.5}
 footer{border-top:1px solid var(--ligne);padding:14px;text-align:center;font-size:11px;color:var(--gris);background:#fff}
+/* ===== Menu mobile : bouton burger + tiroir ===== */
+.burger{display:none;width:40px;height:40px;border:none;border-radius:9px;background:#26272C;color:#fff;font-size:20px;line-height:1;cursor:pointer;align-items:center;justify-content:center;margin-left:auto;flex-shrink:0}
+.burger:active{background:var(--rouge)}
+.mob-title{display:none;font-family:'Barlow Condensed';font-weight:700;font-size:17px;letter-spacing:.05em;text-transform:uppercase;color:#fff;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drawer-bg{position:fixed;inset:0;background:rgba(20,20,25,.55);z-index:80;opacity:0;pointer-events:none;transition:opacity .2s}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(84vw,340px);background:var(--noir);color:#fff;z-index:90;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+body.menu-open .drawer{transform:translateX(0)}
+body.menu-open .drawer-bg{opacity:1;pointer-events:auto}
+body.menu-open{overflow:hidden}
+.drawer-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #2F3036}
+.drawer-head .avatar{width:38px;height:38px;flex-shrink:0}
+.drawer-head b{font-size:14px;display:block}
+.drawer-head span{font-size:12px;color:#9B9CA3}
+.drawer-close{margin-left:auto;background:none;border:none;color:#9B9CA3;font-size:26px;line-height:1;cursor:pointer;padding:4px 6px}
+.drawer-list{display:flex;flex-direction:column;padding:8px 10px;gap:2px}
+.drawer-list button{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:none;border:none;color:#D8D8DC;padding:13px 12px;border-radius:10px;cursor:pointer}
+.drawer-list button .ic{width:38px;height:38px;border-radius:10px;background:#26272C;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.drawer-list button .tx{display:flex;flex-direction:column;gap:2px}
+.drawer-list button .tx b{font-family:'Barlow Condensed';font-weight:700;font-size:16px;letter-spacing:.04em;text-transform:uppercase;color:#fff}
+.drawer-list button .tx small{font-size:11.5px;color:#9B9CA3}
+.drawer-list button.active{background:#26272C}
+.drawer-list button.active .ic{background:var(--rouge);color:#fff}
+.drawer-foot{margin-top:auto;padding:14px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid #2F3036;font-size:11.5px;color:#9B9CA3;display:flex;flex-direction:column;gap:10px}
+.drawer-foot .btn{width:100%}
 /* ===== Barre d'onglets basse (mobile / PWA) ===== */
-.bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--noir);border-top:3px solid var(--rouge);z-index:60;padding-bottom:env(safe-area-inset-bottom)}
+.bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--noir);border-top:3px solid var(--rouge);z-index:60;padding-bottom:max(6px,env(safe-area-inset-bottom))}
 .bnav button{flex:1;background:none;border:none;color:#9B9CA3;padding:9px 2px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
 .bnav button .ic{font-size:18px;line-height:1}
 .bnav button .tx{font-family:'Barlow Condensed';font-weight:600;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase}
@@ -199,8 +223,10 @@ footer{border-top:1px solid var(--ligne);padding:14px;text-align:center;font-siz
 @media(max-width:760px){
   header{height:52px;padding:0 14px;gap:12px}
   header nav{display:none}
-  .user span{display:none}
-  .logo span{font-size:16px}
+  .user{display:none}
+  .burger{display:flex}
+  .mob-title{display:block}
+  .logo span{display:none}
   .logo .badge{width:32px;height:32px;font-size:9.5px}
   main{padding:16px 14px 140px}
   h1{font-size:23px}
@@ -237,9 +263,30 @@ footer{border-top:1px solid var(--ligne);padding:14px;text-align:center;font-siz
     <button data-s="perso">Personnaliser</button>
     <button data-s="projet">Suivi de projet</button>
   </nav>
+  <span class="mob-title" id="mob-title">Tableau de bord</span>
   <button id="btn-install" class="btn rouge" style="display:none;padding:7px 12px;font-size:12px;margin-right:12px">Installer l'application</button>
   <div class="user"><span>Magasin <b>GRENOBLE ÉCHIROLLES</b> · Sport 2000</span><div class="avatar">GE</div></div>
+  <button class="burger" id="burger" aria-label="Ouvrir le menu" aria-controls="drawer" aria-expanded="false">☰</button>
 </header>
+
+<div class="drawer-bg" id="drawer-bg"></div>
+<aside class="drawer" id="drawer" aria-label="Menu de navigation">
+  <div class="drawer-head">
+    <div class="avatar">GE</div>
+    <div><b>GRENOBLE ÉCHIROLLES</b><span>Sport 2000 · adhérent</span></div>
+    <button class="drawer-close" id="drawer-close" aria-label="Fermer le menu">×</button>
+  </div>
+  <nav class="drawer-list">
+    <button class="active" data-s="dash"><span class="ic">▦</span><span class="tx"><b>Tableau de bord</b><small>Frise 2027, rappels, commandes à compléter</small></span></button>
+    <button data-s="cmd"><span class="ic">🛒</span><span class="tx"><b>Commander</b><small>Opérations nationales et objets publicitaires</small></span></button>
+    <button data-s="perso"><span class="ic">✎</span><span class="tx"><b>Personnaliser</b><small>Supports locaux, prévisualisation, BAT</small></span></button>
+    <button data-s="projet"><span class="ic">◷</span><span class="tx"><b>Suivi de projet</b><small>Jalons, relecture, intervenants</small></span></button>
+  </nav>
+  <div class="drawer-foot">
+    <button id="btn-install-m" class="btn rouge" style="display:none">Installer l'application</button>
+    <span>Prototype PWA · Plateforme collaborative marketing · écrans non contractuels</span>
+  </div>
+</aside>
 <div class="stripe"></div>
 
 <main>
@@ -500,14 +547,23 @@ footer{border-top:1px solid var(--ligne);padding:14px;text-align:center;font-siz
 <footer>Prototype PWA - Plateforme collaborative marketing Sport 2000 · Réponse AO 2026 · Écrans non contractuels<br>Application installable sur smartphone et tablette · notifications push · consultation et commande en mobilité</footer>
 
 <script>
+const TITRES={dash:'Tableau de bord',cmd:'Commander',perso:'Personnaliser',projet:'Suivi de projet'};
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  document.querySelectorAll('header nav button, .bnav button').forEach(b=>b.classList.toggle('active',b.dataset.s===id));
+  document.querySelectorAll('header nav button, .bnav button, .drawer-list button').forEach(b=>b.classList.toggle('active',b.dataset.s===id));
   document.getElementById('cmd-bar').classList.toggle('on', id==='cmd');
+  document.getElementById('mob-title').textContent=TITRES[id]||'';
+  closeMenu();
   window.scrollTo(0,0);
 }
-document.querySelectorAll('header nav button, .bnav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.s)));
+document.querySelectorAll('header nav button, .bnav button, .drawer-list button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.s)));
+function openMenu(){document.body.classList.add('menu-open');document.getElementById('burger').setAttribute('aria-expanded','true');}
+function closeMenu(){document.body.classList.remove('menu-open');document.getElementById('burger').setAttribute('aria-expanded','false');}
+document.getElementById('burger').addEventListener('click',()=>document.body.classList.contains('menu-open')?closeMenu():openMenu());
+document.getElementById('drawer-close').addEventListener('click',closeMenu);
+document.getElementById('drawer-bg').addEventListener('click',closeMenu);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
 function q(btn,delta){
   const input=btn.parentElement.querySelector('input');
   input.value=Math.max(0,parseInt(input.value||0)+delta);
@@ -550,9 +606,12 @@ if ('serviceWorker' in navigator) {
 // Bouton d'installation (Chrome / Edge / Android) ; sur iOS : Partager > Sur l'écran d'accueil
 let deferredPrompt = null;
 const btnInstall = document.getElementById('btn-install');
-window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; btnInstall.style.display = 'inline-block'; });
-btnInstall.addEventListener('click', async () => { if (!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; btnInstall.style.display = 'none'; });
-window.addEventListener('appinstalled', () => { btnInstall.style.display = 'none'; });
+const btnInstallM = document.getElementById('btn-install-m');
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; btnInstall.style.display = 'inline-block'; btnInstallM.style.display = 'inline-block'; });
+async function installer() { if (!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; btnInstall.style.display = 'none'; btnInstallM.style.display = 'none'; }
+btnInstall.addEventListener('click', installer);
+btnInstallM.addEventListener('click', installer);
+window.addEventListener('appinstalled', () => { btnInstall.style.display = 'none'; btnInstallM.style.display = 'none'; });
 // Liens profonds vers un onglet (#cmd, #perso, #projet) pour les raccourcis du manifest
 const hash = location.hash.replace('#', '');
 if (['dash','cmd','perso','projet'].includes(hash)) go(hash);

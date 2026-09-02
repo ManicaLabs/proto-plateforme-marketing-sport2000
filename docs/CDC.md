@@ -36,7 +36,7 @@ Le prototype doit être installable (PWA) et fonctionner hors ligne après la pr
 ## 3. Architecture actuelle (v1, en prod)
 
 - Écrans : `#dash` (frise 2027, KPI, bandeau J-12), `#cmd` (Rentrée des classes 2027 : kit obligatoire, PLV, questionnaire, total au fil de l'eau), `#perso` (Anniversaire 10 ans : champs à gauche, aperçu temps réel à droite, envoi BAT), `#projet` (Dépliant Noël : 5 jalons, relecture BAT v3, intervenants).
-- Navigation : `go(id)` bascule les sections `.screen` ; barre haute (desktop) et `.bnav` basse (mobile < 760 px) ; barre `#cmd-bar` collante sur l'écran commande en mobile.
+- Navigation : `go(id)` bascule les sections `.screen` et synchronise les trois menus. Desktop : barre haute. Mobile (< 760 px) : bouton ☰ dans l'en-tête ouvrant un tiroir latéral (`.drawer`, 4 écrans avec descriptions, bouton d'installation, fermeture par ×, fond ou Échap), titre de l'écran courant dans l'en-tête (`#mob-title`), barre d'onglets basse `.bnav` en accès rapide, barre `#cmd-bar` collante sur l'écran commande.
 - État : en mémoire uniquement (aucun `localStorage`), tout est réinitialisé au rechargement. C'est volontaire.
 - PWA : enregistrement `sw.js` au `load` ; bouton `#btn-install` affiché sur `beforeinstallprompt` (Android / Chrome / Edge) ; iOS passe par Partager > Sur l'écran d'accueil.
 - Polices : Barlow Condensed + Inter via Google Fonts (réseau ; mises en cache par le SW après première visite).
@@ -51,7 +51,9 @@ Le prototype doit être installable (PWA) et fonctionner hors ligne après la pr
 
 ## 5. État d'avancement
 
-- ✅ v1 : 4 écrans, responsive, PWA installable, hors ligne, icônes, manifest, README.
+- ✅ v1.0 : 4 écrans, responsive, PWA installable, hors ligne, icônes, manifest, README.
+- ✅ v1.1 : URL de publication dans README et CDC.
+- ✅ v1.2 : navigation mobile robuste (menu ☰ + tiroir, titre d'écran, barre basse conservée) ; SW `pm-proto-v2`.
 - 🚧 Rien en cours.
 - ⚠️ Aucune anomalie connue. Pas de capture de l'écran suivi de projet dans les documents d'offre (seulement dans l'app).
 
@@ -67,6 +69,8 @@ Le prototype doit être installable (PWA) et fonctionner hors ligne après la pr
 - Variante de charte par enseigne (Mondovelo, Espace Montagne...).
 
 ## 8. Pièges et conventions
+
+- Sur mobile, ne jamais compter sur la seule barre basse fixée : Safari iOS et Chrome Android peuvent la recouvrir de leur barre d'outils. Le menu ☰ dans l'en-tête est le point d'entrée garanti.
 
 - Changer `VERSION` dans `sw.js` à chaque déploiement, sinon les clients gardent l'ancienne version en cache.
 - `.nojekyll` obligatoire (sinon Pages ignore certains fichiers).
