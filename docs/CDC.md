@@ -16,8 +16,8 @@ Le prototype doit être installable (PWA) et fonctionner hors ligne après la pr
 
 ## 2. Liens, accès et déploiement
 
-- **App (prod)** : https://OWNER.github.io/REPO/  (à compléter après publication)
-- **Dépôt** : https://github.com/OWNER/REPO - GitHub Pages servi depuis `main`, racine
+- **App (prod)** : https://manicalabs.github.io/proto-plateforme-marketing-sport2000/
+- **Dépôt** : https://github.com/ManicaLabs/proto-plateforme-marketing-sport2000 - GitHub Pages servi depuis `main`, racine
 - **Déploiement = `git push origin main`** (build automatique, ~1 à 2 min ; vérifier Settings > Pages)
 - **Auth** : push effectué par Cédric depuis son poste (`gh auth`) ; aucun token ne transite par les sessions Claude.
 - **Cache Pages** : ~10 min ; rafraîchissement forcé parfois nécessaire. Le service worker versionne son cache

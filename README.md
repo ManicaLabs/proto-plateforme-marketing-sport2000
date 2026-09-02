@@ -12,7 +12,7 @@ Prototype interactif présenté par **Manica Labs** dans le cadre de la réponse
 
 ## Essayer
 
-Ouvrir l'URL GitHub Pages du dépôt sur un smartphone : le navigateur propose l'installation
+Ouvrir https://manicalabs.github.io/proto-plateforme-marketing-sport2000/ sur un smartphone : le navigateur propose l'installation
 (Android / Chrome / Edge : bouton « Installer l'application » ; iOS : Partager > Sur l'écran d'accueil).
 
 ## Publication (GitHub Pages)
