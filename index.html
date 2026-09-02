@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#17181C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Plateforme Collaborative Marketing - Prototype PWA</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<meta name="description" content="Prototype PWA de la plateforme collaborative marketing Sport 2000 - réponse AO Manica Labs">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --rouge:#D8121F; --rouge-fonce:#A80D17; --noir:#17181C; --encre:#2B2C31;
+  --fond:#F5F4F2; --blanc:#FFFFFF; --ligne:#E6E3DF;
+  --vert:#2E9E4F; --vert-pale:#E7F5EC; --ambre:#DE9B0E; --ambre-pale:#FCF3DE;
+  --local:#1E5AA8; --local-pale:#E8F0FA; --gris:#6E6F76;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--fond);color:var(--encre);font-size:14px}
+.stripe{height:8px;background:repeating-linear-gradient(135deg,var(--rouge) 0 14px,var(--noir) 14px 28px)}
+/* ===== Top bar ===== */
+header{background:var(--noir);color:#fff;display:flex;align-items:center;gap:28px;padding:0 28px;height:60px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo .badge{width:38px;height:38px;border-radius:50%;background:var(--rouge);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:11px;line-height:1;text-align:center}
+.logo span{font-family:'Barlow Condensed';font-weight:700;font-size:20px;letter-spacing:.06em}
+nav{display:flex;gap:4px;flex:1}
+nav button{background:none;border:none;color:#C9C9CE;font-family:'Barlow Condensed';font-weight:600;font-size:16px;letter-spacing:.05em;text-transform:uppercase;padding:10px 16px;cursor:pointer;border-bottom:3px solid transparent;height:60px}
+nav button.active{color:#fff;border-bottom-color:var(--rouge)}
+nav button:hover{color:#fff}
+.user{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#C9C9CE}
+.user b{color:#fff;font-weight:600}
+.avatar{width:32px;height:32px;border-radius:50%;background:#3A3B42;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff}
+main{max-width:1180px;margin:0 auto;padding:26px 24px 60px}
+.screen{display:none}.screen.active{display:block}
+h1{font-family:'Barlow Condensed';font-weight:700;font-size:30px;letter-spacing:.02em;color:var(--noir);text-transform:uppercase}
+.sub{color:var(--gris);margin-top:2px}
+.card{background:var(--blanc);border:1px solid var(--ligne);border-radius:10px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:99px}
+.chip.nat{background:#FBE8EA;color:var(--rouge-fonce)}
+.chip.loc{background:var(--local-pale);color:var(--local)}
+.chip.ok{background:var(--vert-pale);color:#1E7A3C}
+.chip.warn{background:var(--ambre-pale);color:#9A6B04}
+.chip.gris{background:#EFEEEC;color:var(--gris)}
+.btn{border:none;border-radius:8px;font-family:'Inter';font-weight:600;font-size:13.5px;padding:11px 20px;cursor:pointer}
+.btn.rouge{background:var(--rouge);color:#fff}.btn.rouge:hover{background:var(--rouge-fonce)}
+.btn.ghost{background:#fff;color:var(--encre);border:1px solid var(--ligne)}
+.btn.vert{background:var(--vert);color:#fff}
+/* ===== Dashboard ===== */
+.alerte{display:flex;align-items:center;gap:14px;background:var(--noir);color:#fff;border-radius:10px;padding:14px 18px;margin:18px 0}
+.alerte .pastille{width:40px;height:40px;border-radius:10px;background:var(--rouge);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:19px;flex-shrink:0}
+.alerte b{font-size:14.5px}.alerte .d{color:#C9C9CE;font-size:12.5px;margin-top:1px}
+.alerte .btn{margin-left:auto}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.kpi{padding:16px 18px}
+.kpi .n{font-family:'Barlow Condensed';font-weight:700;font-size:34px;line-height:1;color:var(--noir)}
+.kpi .l{font-size:12px;color:var(--gris);margin-top:5px;line-height:1.35}
+.kpi.hot{border-left:4px solid var(--rouge)}
+.kpi.hot .n{color:var(--rouge)}
+/* frise */
+.frise-head{display:flex;align-items:baseline;justify-content:space-between;margin:6px 0 10px}
+.frise-head h2{font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase;letter-spacing:.03em}
+.legende{display:flex;gap:16px;font-size:12px;color:var(--gris)}
+.legende i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.frise{padding:16px 18px 20px;overflow-x:auto}
+.mois{display:grid;grid-template-columns:110px repeat(12,1fr);gap:4px;font-family:'Barlow Condensed';font-weight:600;font-size:13px;letter-spacing:.06em;color:var(--gris);border-bottom:1px solid var(--ligne);padding-bottom:8px;margin-bottom:8px}
+.ligne-op{display:grid;grid-template-columns:110px repeat(12,1fr);gap:4px;align-items:center;min-height:44px}
+.ligne-op .lab{font-size:11.5px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:.04em}
+.op{border-radius:7px;padding:6px 9px;font-size:11.5px;font-weight:600;color:#fff;cursor:pointer;position:relative;line-height:1.25;min-height:38px;display:flex;flex-direction:column;justify-content:center}
+.op small{font-weight:500;opacity:.85;font-size:10px}
+.op.nat{background:var(--rouge)}
+.op.nat.done{background:var(--vert)}
+.op.nat.todo{background:var(--ambre)}
+.op.loc{background:var(--local)}
+.op.loc.plan{background:#fff;color:var(--local);border:1.5px dashed var(--local)}
+.now{grid-row:1/span 20;border-left:2px dashed var(--rouge);opacity:.5}
+/* ===== Commande ===== */
+.op-hero{display:flex;gap:18px;padding:20px 22px;align-items:flex-start}
+.op-hero .vis{width:120px;height:120px;border-radius:10px;background:linear-gradient(135deg,var(--rouge),var(--noir));display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Barlow Condensed';font-weight:700;font-size:15px;text-align:center;line-height:1.2;flex-shrink:0}
+.op-hero h1{font-size:26px}
+.op-hero p{color:var(--gris);margin-top:6px;max-width:640px;line-height:1.5}
+.meta{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.commande-grid{display:grid;grid-template-columns:1fr 300px;gap:18px;margin-top:18px;align-items:start}
+.section-t{font-family:'Barlow Condensed';font-weight:700;font-size:17px;text-transform:uppercase;letter-spacing:.04em;padding:14px 18px;border-bottom:1px solid var(--ligne);display:flex;align-items:center;gap:10px}
+.article{display:flex;gap:14px;padding:14px 18px;border-bottom:1px solid var(--ligne);align-items:center}
+.article:last-child{border-bottom:none}
+.article .ph{width:64px;height:64px;border-radius:8px;background:#EDEBE8;display:flex;align-items:center;justify-content:center;color:#B9B6B1;font-size:10px;text-align:center;flex-shrink:0;font-weight:600}
+.article .inf{flex:1}
+.article .inf b{font-size:13.5px;display:block}
+.article .inf span{font-size:12px;color:var(--gris);display:block;margin-top:2px;line-height:1.4}
+.qty{display:flex;align-items:center;gap:0;border:1px solid var(--ligne);border-radius:8px;overflow:hidden}
+.qty button{width:32px;height:34px;border:none;background:#fff;font-size:16px;cursor:pointer;color:var(--encre)}
+.qty button:hover{background:var(--fond)}
+.qty input{width:44px;height:34px;border:none;border-left:1px solid var(--ligne);border-right:1px solid var(--ligne);text-align:center;font-weight:600;font-size:13.5px}
+.prix{width:78px;text-align:right;font-weight:700;font-size:13.5px}
+.recap{position:sticky;top:20px}
+.recap .in{padding:18px}
+.recap h3{font-family:'Barlow Condensed';font-weight:700;font-size:17px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:12px}
+.recap .row{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;color:var(--gris)}
+.recap .row b{color:var(--encre)}
+.recap .total{display:flex;justify-content:space-between;border-top:2px solid var(--noir);margin-top:10px;padding-top:12px;font-size:15px;font-weight:700}
+.recap .total .v{font-family:'Barlow Condensed';font-size:24px;color:var(--rouge)}
+.recap .note{font-size:11px;color:var(--gris);margin-top:8px;line-height:1.45}
+.recap .btn{width:100%;margin-top:14px}
+.recap .btn.ghost{margin-top:8px}
+.quest{padding:16px 18px}
+.quest .q{margin-bottom:14px}
+.quest .q p{font-size:13px;font-weight:600;margin-bottom:7px}
+.radio{display:inline-flex;gap:14px;font-size:13px;color:var(--gris)}
+.radio label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.oblig{background:var(--ambre-pale);border:1px solid #F0DCA8;border-radius:8px;padding:10px 14px;font-size:12.5px;color:#7A5503;display:flex;gap:8px;align-items:center;margin:14px 18px 4px}
+/* ===== Personnalisation ===== */
+.perso-grid{display:grid;grid-template-columns:340px 1fr;gap:18px;margin-top:18px;align-items:start}
+.panneau{padding:18px}
+.panneau h3{font-family:'Barlow Condensed';font-weight:700;font-size:17px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.panneau .s{font-size:12px;color:var(--gris);margin-bottom:16px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:600;margin-bottom:5px}
+.field input,.field select{width:100%;border:1px solid var(--ligne);border-radius:7px;padding:9px 11px;font-family:'Inter';font-size:13px}
+.field input:focus{outline:2px solid var(--rouge);border-color:transparent}
+.lockinfo{background:var(--fond);border-radius:8px;padding:10px 12px;font-size:11.5px;color:var(--gris);display:flex;gap:8px;line-height:1.45;margin-top:16px}
+.apercu-wrap{padding:20px;display:flex;flex-direction:column;align-items:center;background:linear-gradient(180deg,#EBE9E6,#F5F4F2);border-radius:10px;border:1px solid var(--ligne)}
+.apercu-head{display:flex;justify-content:space-between;width:100%;max-width:480px;align-items:center;margin-bottom:12px}
+.apercu-head span{font-size:12px;color:var(--gris);font-weight:600}
+.affiche{width:420px;background:#fff;box-shadow:0 8px 30px rgba(20,20,25,.18);border-radius:4px;overflow:hidden;position:relative}
+.affiche .creat{background:linear-gradient(140deg,var(--rouge) 55%,var(--noir) 55.5%);color:#fff;padding:34px 26px 30px;position:relative}
+.affiche .creat .lock{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.35);font-size:10px;padding:3px 8px;border-radius:99px;display:flex;gap:4px;align-items:center}
+.affiche .creat .marque{font-family:'Barlow Condensed';font-weight:700;font-size:15px;letter-spacing:.14em}
+.affiche .creat h2{font-family:'Barlow Condensed';font-weight:700;font-size:44px;line-height:.98;text-transform:uppercase;margin-top:8px}
+.affiche .creat .promo{display:inline-block;background:#fff;color:var(--rouge);font-family:'Barlow Condensed';font-weight:700;font-size:30px;padding:4px 14px;border-radius:6px;margin-top:14px}
+.affiche .zone{padding:18px 26px 22px;border-top:3px dashed var(--local);position:relative}
+.affiche .zone .tag{position:absolute;top:-11px;left:20px;background:var(--local);color:#fff;font-size:9.5px;font-weight:700;padding:2px 9px;border-radius:99px;letter-spacing:.05em}
+.affiche .zone b{font-size:16px;display:block}
+.affiche .zone .l1{font-size:12.5px;color:var(--gris);margin-top:4px}
+.affiche .zone .l2{font-size:12.5px;font-weight:600;margin-top:6px;color:var(--encre)}
+.perso-actions{display:flex;gap:10px;margin-top:16px;width:100%;max-width:480px}
+.perso-actions .btn{flex:1}
+.statut-bat{width:100%;max-width:480px;margin-top:12px;background:var(--ambre-pale);border:1px solid #F0DCA8;border-radius:8px;padding:9px 13px;font-size:12px;color:#7A5503;display:flex;gap:8px;align-items:center}
+/* ===== Projet ===== */
+.projet-head{display:flex;justify-content:space-between;align-items:flex-start;padding:20px 22px;gap:16px;flex-wrap:wrap}
+.projet-grid{display:grid;grid-template-columns:1fr 320px;gap:18px;margin-top:18px;align-items:start}
+.jalons{padding:18px 20px}
+.jalon{display:flex;gap:14px;padding:10px 0;position:relative}
+.jalon:not(:last-child):before{content:"";position:absolute;left:13px;top:36px;bottom:-10px;width:2px;background:var(--ligne)}
+.jalon .dot{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;z-index:1}
+.jalon.done .dot{background:var(--vert)}
+.jalon.cur .dot{background:var(--rouge)}
+.jalon.next .dot{background:#fff;border:2px solid var(--ligne);color:var(--gris)}
+.jalon .jc b{font-size:13.5px;display:block}
+.jalon .jc span{font-size:12px;color:var(--gris)}
+.jalon .date{margin-left:auto;font-size:12px;color:var(--gris);white-space:nowrap;font-weight:600}
+.bat{padding:18px 20px}
+.bat-row{display:flex;gap:12px;padding:12px;border:1px solid var(--ligne);border-radius:9px;margin-bottom:10px;align-items:center}
+.bat-row .doc{width:44px;height:56px;border-radius:5px;background:linear-gradient(160deg,var(--rouge) 50%,var(--noir) 50%);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:700}
+.bat-row .bi{flex:1}
+.bat-row .bi b{font-size:13px;display:block}
+.bat-row .bi span{font-size:11.5px;color:var(--gris)}
+.commentaires{margin-top:14px}
+.com{display:flex;gap:10px;margin-bottom:12px}
+.com .avatar{width:28px;height:28px;font-size:11px;flex-shrink:0}
+.com .cb{background:var(--fond);border-radius:0 10px 10px 10px;padding:9px 12px;font-size:12.5px;line-height:1.45;flex:1}
+.com .cb b{font-size:12px}
+.com .cb .t{color:var(--gris);font-size:10.5px;margin-left:6px;font-weight:500}
+.com.externe .cb{background:var(--local-pale)}
+.participants{padding:18px}
+.participants h3{font-family:'Barlow Condensed';font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:12px}
+.part{display:flex;align-items:center;gap:10px;padding:7px 0}
+.part .avatar{width:30px;height:30px;font-size:11px}
+.part .pi{flex:1}
+.part .pi b{font-size:12.5px;display:block}
+.part .pi span{font-size:11px;color:var(--gris)}
+.alert-planning{margin-top:14px;background:var(--ambre-pale);border:1px solid #F0DCA8;border-radius:8px;padding:10px 12px;font-size:12px;color:#7A5503;line-height:1.5}
+footer{border-top:1px solid var(--ligne);padding:14px;text-align:center;font-size:11px;color:var(--gris);background:#fff}
+/* ===== Barre d'onglets basse (mobile / PWA) ===== */
+.bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--noir);border-top:3px solid var(--rouge);z-index:60;padding-bottom:env(safe-area-inset-bottom)}
+.bnav button{flex:1;background:none;border:none;color:#9B9CA3;padding:9px 2px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bnav button .ic{font-size:18px;line-height:1}
+.bnav button .tx{font-family:'Barlow Condensed';font-weight:600;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase}
+.bnav button.active{color:#fff}
+.bnav button.active .ic{color:var(--rouge)}
+/* ===== Barre commande collante (mobile) ===== */
+.cmd-bar{display:none;position:fixed;left:0;right:0;bottom:58px;z-index:55;background:#fff;border-top:1px solid var(--ligne);box-shadow:0 -6px 18px rgba(20,20,25,.10);padding:10px 16px calc(10px + env(safe-area-inset-bottom)/2);align-items:center;gap:12px}
+.cmd-bar .ct{flex:1}
+.cmd-bar .ct .l{font-size:10.5px;color:var(--gris);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.cmd-bar .ct .v{font-family:'Barlow Condensed';font-weight:700;font-size:22px;color:var(--rouge);line-height:1.05}
+/* ===== Responsive ===== */
+.frise .mois,.frise .ligne-op{min-width:920px}
+@media(max-width:1024px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .commande-grid,.perso-grid,.projet-grid{grid-template-columns:1fr}
+  .recap{position:static}
+  .affiche{width:100%;max-width:420px}
+}
+@media(max-width:760px){
+  header{height:52px;padding:0 14px;gap:12px}
+  header nav{display:none}
+  .user span{display:none}
+  .logo span{font-size:16px}
+  .logo .badge{width:32px;height:32px;font-size:9.5px}
+  main{padding:16px 14px 140px}
+  h1{font-size:23px}
+  .kpis{gap:10px}
+  .kpi{padding:12px 14px}
+  .kpi .n{font-size:27px}
+  .alerte{flex-wrap:wrap}
+  .alerte .btn{margin-left:0;width:100%}
+  .legende{flex-wrap:wrap;gap:8px}
+  .frise-head{flex-direction:column;align-items:flex-start;gap:8px}
+  .op-hero{flex-direction:column}
+  .op-hero .vis{width:100%;height:84px}
+  .article{flex-wrap:wrap}
+  .article .inf{flex:1 1 100%;order:-1}
+  .article .ph{width:52px;height:52px}
+  .prix{margin-left:auto}
+  .apercu-wrap{padding:14px}
+  .perso-actions{flex-direction:column}
+  .projet-head .btn{width:100%}
+  .jalon .date{display:none}
+  .bnav{display:flex}
+  #cmd.active ~ * .cmd-bar, .cmd-bar.on{display:flex}
+  .recap .btn.rouge{display:none}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><div class="badge">SPORT<br>2000</div><span>PLATEFORME MARKETING</span></div>
+  <nav>
+    <button class="active" data-s="dash">Tableau de bord</button>
+    <button data-s="cmd">Commander</button>
+    <button data-s="perso">Personnaliser</button>
+    <button data-s="projet">Suivi de projet</button>
+  </nav>
+  <button id="btn-install" class="btn rouge" style="display:none;padding:7px 12px;font-size:12px;margin-right:12px">Installer l'application</button>
+  <div class="user"><span>Magasin <b>GRENOBLE ÉCHIROLLES</b> · Sport 2000</span><div class="avatar">GE</div></div>
+</header>
+<div class="stripe"></div>
+
+<main>
+<!-- ============ DASHBOARD ============ -->
+<section class="screen active" id="dash">
+  <h1>Bonjour, Grenoble Échirolles</h1>
+  <div class="sub">Votre activité marketing - opérations nationales et locales sur une même frise.</div>
+
+  <div class="alerte">
+    <div class="pastille">J-12</div>
+    <div><b>La fenêtre de commande AUTOMNE-HIVER 2027 ferme le 30 juin.</b>
+      <div class="d">2 opérations obligatoires restent à compléter. Rappels programmés : J-7 et J-2 par notification et e-mail.</div>
+    </div>
+    <button class="btn rouge" onclick="go('cmd')">Compléter mes commandes</button>
+  </div>
+
+  <div class="kpis">
+    <div class="card kpi hot"><div class="n">2</div><div class="l">Commandes obligatoires<br>à compléter</div></div>
+    <div class="card kpi"><div class="n">5</div><div class="l">Commandes validées<br>ce semestre</div></div>
+    <div class="card kpi"><div class="n">3</div><div class="l">Opérations locales<br>planifiées</div></div>
+    <div class="card kpi"><div class="n">1</div><div class="l">BAT en attente<br>de validation centrale</div></div>
+  </div>
+
+  <div class="frise-head">
+    <h2>Frise 2027 - Mon calendrier marketing</h2>
+    <div class="legende">
+      <span><i style="background:var(--rouge)"></i>Nationale à commander</span>
+      <span><i style="background:var(--vert)"></i>Nationale commandée</span>
+      <span><i style="background:var(--ambre)"></i>À compléter</span>
+      <span><i style="background:var(--local)"></i>Locale planifiée</span>
+      <span><i style="border:1.5px dashed var(--local);background:#fff"></i>Locale en préparation</span>
+    </div>
+  </div>
+  <div class="card frise">
+    <div class="mois"><span></span><span>JAN</span><span>FÉV</span><span>MAR</span><span>AVR</span><span>MAI</span><span>JUIN</span><span>JUIL</span><span>AOÛT</span><span>SEP</span><span>OCT</span><span>NOV</span><span>DÉC</span></div>
+    <div class="ligne-op">
+      <span class="lab">Conquête</span>
+      <div class="op nat done" style="grid-column:2/span 2">SOLDES HIVER<small>Commandée ✓</small></div>
+      <div class="op nat done" style="grid-column:5/span 2">BEAUX JOURS<small>Commandée ✓</small></div>
+      <div class="op nat todo" style="grid-column:9/span 2" onclick="go('cmd')">RENTRÉE DES CLASSES<small>À compléter - obligatoire</small></div>
+      <div class="op nat" style="grid-column:12/span 1">NOËL<small>Ouvre le 01/06</small></div>
+    </div>
+    <div class="ligne-op">
+      <span class="lab">Fidélité</span>
+      <div class="op nat done" style="grid-column:4/span 1">LA CARTE<small>Commandée ✓</small></div>
+      <div class="op nat todo" style="grid-column:10/span 1" onclick="go('cmd')">LA CARTE AH<small>À compléter</small></div>
+    </div>
+    <div class="ligne-op">
+      <span class="lab">Événementiel</span>
+      <div class="op nat done" style="grid-column:3/span 1">BOOSTER<small>Commandée ✓</small></div>
+    </div>
+    <div class="ligne-op">
+      <span class="lab">Mes opérations locales</span>
+      <div class="op loc" style="grid-column:6/span 1" onclick="go('perso')">FÊTE DES PÈRES<small>BAT validé ✓</small></div>
+      <div class="op loc" style="grid-column:9/span 1" onclick="go('perso')">ANNIVERSAIRE 10 ANS<small>BAT en validation</small></div>
+      <div class="op loc plan" style="grid-column:11/span 1" onclick="go('perso')">PORTES OUVERTES<small>En préparation</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMMANDE ============ -->
+<section class="screen" id="cmd">
+  <div class="card op-hero">
+    <div class="vis">RENTRÉE<br>DES<br>CLASSES<br>2027</div>
+    <div>
+      <h1>Rentrée des classes 2027</h1>
+      <p>Jusqu'à -40 % sur une sélection rentrée. Commandez vos supports pour votre point de vente : le kit PLV de l'opération est obligatoire dans le cadre du pacte coopératif.</p>
+      <div class="meta">
+        <span class="chip nat">Opération obligatoire</span>
+        <span class="chip gris">Commandes ouvertes jusqu'au 30/06</span>
+        <span class="chip gris">Opération du 20/08 au 15/09</span>
+        <span class="chip ok">Dépliant pris en charge par la centrale</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="commande-grid">
+    <div>
+      <div class="card">
+        <div class="section-t">Kit obligatoire <span class="chip warn">Requis - pacte coopératif</span></div>
+        <div class="article">
+          <div class="ph">KIT PLV</div>
+          <div class="inf"><b>Kit PLV obligatoire Rentrée 2027</b><span>Étiquettes repositionnables (3 lots de 50) · gongoles haute et basse · 2 bandeaux podium · notice</span></div>
+          <div class="qty"><button onclick="q(this,-1)">−</button><input value="1" data-pu="90" onchange="tot()"><button onclick="q(this,1)">+</button></div>
+          <div class="prix" data-l>90,00 €</div>
+        </div>
+        <div class="oblig">⚠ Si ce kit n'est pas commandé, la centrale vous l'attribuera automatiquement.</div>
+        <div style="height:12px"></div>
+      </div>
+      <div style="height:14px"></div>
+      <div class="card">
+        <div class="section-t">PLV - supports du point de vente</div>
+        <div class="article">
+          <div class="ph">PLV<br>120×80</div>
+          <div class="inf"><b>PLV 120 × 80 recto/verso</b><span>Lot de 5 ex. - allée centrale · aperçu et formats disponibles</span></div>
+          <div class="qty"><button onclick="q(this,-1)">−</button><input value="2" data-pu="30" onchange="tot()"><button onclick="q(this,1)">+</button></div>
+          <div class="prix" data-l>60,00 €</div>
+        </div>
+        <div class="article">
+          <div class="ph">AKYLUX</div>
+          <div class="inf"><b>PLV parking (Akylux)</b><span>Lot de 2 panneaux 116 × 156 cm - livré avec colsons et clips</span></div>
+          <div class="qty"><button onclick="q(this,-1)">−</button><input value="1" data-pu="25" onchange="tot()"><button onclick="q(this,1)">+</button></div>
+          <div class="prix" data-l>25,00 €</div>
+        </div>
+        <div class="article">
+          <div class="ph">STICKER</div>
+          <div class="inf"><b>Sticker vitrophanie</b><span>L50 × H100 cm - portes vitrées et vitrines · vendu à l'unité</span></div>
+          <div class="qty"><button onclick="q(this,-1)">−</button><input value="0" data-pu="18" onchange="tot()"><button onclick="q(this,1)">+</button></div>
+          <div class="prix" data-l>0,00 €</div>
+        </div>
+      </div>
+      <div style="height:14px"></div>
+      <div class="card">
+        <div class="section-t">Questionnaire de l'opération</div>
+        <div class="quest">
+          <div class="q"><p>Êtes-vous ouvert le dimanche pendant l'opération ?</p>
+            <div class="radio"><label><input type="radio" name="dim" checked> Oui</label><label><input type="radio" name="dim"> Non</label></div>
+          </div>
+          <div class="q"><p>Votre choix de communication (pacte incitatif) :</p>
+            <div class="radio" style="flex-direction:column;gap:8px">
+              <label><input type="radio" name="com" checked> Je communique via la plateforme multilocale (campagne programmée par la centrale)</label>
+              <label><input type="radio" name="com"> Je communique via le dépliant/flyer</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card recap">
+      <div class="in">
+        <h3>Ma commande</h3>
+        <div class="row"><span>Kit obligatoire</span><b id="r-kit">90,00 €</b></div>
+        <div class="row"><span>PLV</span><b id="r-plv">85,00 €</b></div>
+        <div class="row"><span>Livraison</span><b>Adresse principale</b></div>
+        <div class="total"><span>Total HT</span><span class="v" id="r-total">175,00 €</span></div>
+        <div class="note">Affichage indicatif - facturation ou prise en charge (totale/partielle) par la centrale. Aucun paiement en ligne.</div>
+        <button class="btn rouge" onclick="alert('Commande validée - confirmation envoyée par e-mail avec le détail et les CGV.')">Valider ma commande</button>
+        <button class="btn ghost">Enregistrer le brouillon</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PERSONNALISATION ============ -->
+<section class="screen" id="perso">
+  <h1>Personnaliser - Anniversaire 10 ans</h1>
+  <div class="sub">Opération locale · gabarit « Affiche événement A2 » · les éléments créatifs sont verrouillés, vous personnalisez uniquement les zones autorisées.</div>
+
+  <div class="perso-grid">
+    <div class="card panneau">
+      <h3>Mes informations</h3>
+      <div class="s">La prévisualisation se met à jour en temps réel.</div>
+      <div class="field"><label>Pourcentage de remise</label>
+        <select id="f-promo" oninput="maj()"><option>-20 %</option><option selected>-30 %</option><option>-40 %</option><option>-50 %</option></select></div>
+      <div class="field"><label>Date de l'événement</label><input id="f-date" value="Samedi 18 septembre" oninput="maj()"></div>
+      <div class="field"><label>Adresse du magasin</label><input id="f-adr" value="14 av. de Grugliasco, Échirolles" oninput="maj()"></div>
+      <div class="field"><label>Horaires</label><input id="f-hor" value="9h30 – 19h30 non-stop" oninput="maj()"></div>
+      <div class="field"><label>Réseaux sociaux</label><input id="f-rs" value="@sport2000echirolles" oninput="maj()"></div>
+      <div class="field"><label>Photographie locale (en-tête zone magasin)</label><input type="file" disabled title="Prototype"></div>
+      <div class="lockinfo">🔒 Le visuel de campagne, la marque et la mécanique de l'offre sont définis par la centrale et ne sont pas modifiables.</div>
+    </div>
+
+    <div>
+      <div class="apercu-wrap">
+        <div class="apercu-head"><span>PRÉVISUALISATION TEMPS RÉEL - fidèle à l'impression (PDF, fonds perdus, quadri)</span><span class="chip loc">Gabarit v2027-EVT-A2</span></div>
+        <div class="affiche">
+          <div class="creat">
+            <div class="lock">🔒 Zone créative verrouillée</div>
+            <div class="marque">SPORT 2000</div>
+            <h2>10 ans,<br>ça se fête !</h2>
+            <div class="promo" id="p-promo">-30 %</div>
+          </div>
+          <div class="zone">
+            <span class="tag">ZONE PERSONNALISABLE</span>
+            <b id="p-date">Samedi 18 septembre</b>
+            <div class="l1" id="p-adr">14 av. de Grugliasco, Échirolles</div>
+            <div class="l1" id="p-hor">9h30 – 19h30 non-stop</div>
+            <div class="l2" id="p-rs">@sport2000echirolles</div>
+          </div>
+        </div>
+        <div class="perso-actions">
+          <button class="btn ghost">Télécharger l'aperçu PDF</button>
+          <button class="btn rouge" onclick="bat()">Envoyer en validation (BAT centrale)</button>
+        </div>
+        <div class="statut-bat" id="statut-bat">⏳ Statut : brouillon - la centrale valide chaque BAT avant l'envoi en impression.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROJET ============ -->
+<section class="screen" id="projet">
+  <div class="card projet-head">
+    <div>
+      <h1>Dépliant Noël 2027 - 8 pages</h1>
+      <div class="sub">Projet n° P27-142 · Opération nationale NOËL 2027 · échéance impression : 25/10/2027</div>
+      <div class="meta" style="margin-top:10px">
+        <span class="chip nat">Opération nationale</span>
+        <span class="chip warn">Jalon en cours : relecture BAT v3</span>
+        <span class="chip gris">7 intervenants</span>
+      </div>
+    </div>
+    <button class="btn ghost">Planning partagé complet</button>
+  </div>
+
+  <div class="projet-grid">
+    <div>
+      <div class="card jalons">
+        <div class="section-t" style="border:none;padding:0 0 12px">Jalons du projet</div>
+        <div class="jalon done"><div class="dot">✓</div><div class="jc"><b>Brief validé</b><span>Cadrage centrale + agence</span></div><div class="date">02/09</div></div>
+        <div class="jalon done"><div class="dot">✓</div><div class="jc"><b>Pages déposées par l'agence</b><span>8 pages - dépôt sur l'espace projet</span></div><div class="date">28/09</div></div>
+        <div class="jalon cur"><div class="dot">3</div><div class="jc"><b>Relecture BAT v3 - en cours</b><span>2 retours ouverts · relance automatique J-2 avant échéance</span></div><div class="date">échéance 12/10</div></div>
+        <div class="jalon next"><div class="dot">4</div><div class="jc"><b>Validation des fichiers HD</b><span>Contrôle final avant transmission imprimeur</span></div><div class="date">18/10</div></div>
+        <div class="jalon next"><div class="dot">5</div><div class="jc"><b>Transmission des répartitions à l'imprimeur</b><span>Quantités par magasin - export automatique</span></div><div class="date">25/10</div></div>
+      </div>
+      <div style="height:14px"></div>
+      <div class="card bat">
+        <div class="section-t" style="border:none;padding:0 0 12px">Relecture - BAT v3</div>
+        <div class="bat-row">
+          <div class="doc">PDF</div>
+          <div class="bi"><b>Depliant_NOEL27_BAT_v3.pdf</b><span>Déposé par l'agence · 12,4 Mo · historique : v1, v2</span></div>
+          <span class="chip warn">2 annotations ouvertes</span>
+          <button class="btn ghost">Annoter</button>
+        </div>
+        <div class="commentaires">
+          <div class="com"><div class="avatar" style="background:var(--rouge)">MM</div>
+            <div class="cb"><b>Mélanie M.</b> <span class="chip gris" style="font-size:9.5px;padding:1px 7px">Centrale</span><span class="t">hier, 16:42</span><br>Page 4 : le prix du pack running doit passer à 89,99 € - voir grille validée au semestre.</div></div>
+          <div class="com externe"><div class="avatar" style="background:var(--local)">JH</div>
+            <div class="cb"><b>Studio Just Happiness</b> <span class="chip loc" style="font-size:9.5px;padding:1px 7px">Agence - accès par lien</span><span class="t">aujourd'hui, 09:15</span><br>Corrigé en v3. Reste l'arbitrage visuel p.6 : proposition A (ski) ou B (montagne famille) ?</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card participants">
+      <h3>Intervenants</h3>
+      <div class="part"><div class="avatar" style="background:var(--rouge)">MM</div><div class="pi"><b>Mélanie Mary</b><span>Centrale - chef de projet</span></div><span class="chip ok">Plateforme</span></div>
+      <div class="part"><div class="avatar" style="background:var(--rouge)">MS</div><div class="pi"><b>Maria Silvestre Dias</b><span>Centrale - chef de projet</span></div><span class="chip ok">Plateforme</span></div>
+      <div class="part"><div class="avatar" style="background:var(--local)">JH</div><div class="pi"><b>Studio Just Happiness</b><span>Agence - dépôt des pages</span></div><span class="chip loc">Lien sécurisé</span></div>
+      <div class="part"><div class="avatar" style="background:#3A3B42">IM</div><div class="pi"><b>Imprimerie (à sélectionner)</b><span>Réception des répartitions</span></div><span class="chip loc">Lien sécurisé</span></div>
+      <div class="alert-planning">🔔 <b>Alertes automatiques :</b> chaque intervenant est relancé par notification à J-2 de son échéance. Historique complet des modifications conservé.</div>
+    </div>
+  </div>
+</section>
+</main>
+
+<div class="cmd-bar" id="cmd-bar">
+  <div class="ct"><div class="l">Total HT (indicatif)</div><div class="v" id="r-total-m">175,00 €</div></div>
+  <button class="btn rouge" onclick="alert('Commande validée - confirmation envoyée par e-mail avec le détail et les CGV.')">Valider</button>
+</div>
+
+<nav class="bnav" aria-label="Navigation principale mobile">
+  <button class="active" data-s="dash"><span class="ic">▦</span><span class="tx">Accueil</span></button>
+  <button data-s="cmd"><span class="ic">🛒</span><span class="tx">Commander</span></button>
+  <button data-s="perso"><span class="ic">✎</span><span class="tx">Personnaliser</span></button>
+  <button data-s="projet"><span class="ic">◷</span><span class="tx">Projets</span></button>
+</nav>
+
+<footer>Prototype PWA - Plateforme collaborative marketing Sport 2000 · Réponse AO 2026 · Écrans non contractuels<br>Application installable sur smartphone et tablette · notifications push · consultation et commande en mobilité</footer>
+
+<script>
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('header nav button, .bnav button').forEach(b=>b.classList.toggle('active',b.dataset.s===id));
+  document.getElementById('cmd-bar').classList.toggle('on', id==='cmd');
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('header nav button, .bnav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.s)));
+function q(btn,delta){
+  const input=btn.parentElement.querySelector('input');
+  input.value=Math.max(0,parseInt(input.value||0)+delta);
+  tot();
+}
+function tot(){
+  let kit=0,plv=0;
+  document.querySelectorAll('#cmd .card').forEach((card,ci)=>{
+    card.querySelectorAll('.article').forEach(a=>{
+      const inp=a.querySelector('input[data-pu]');if(!inp)return;
+      const line=parseInt(inp.value||0)*parseFloat(inp.dataset.pu);
+      a.querySelector('[data-l]').textContent=line.toFixed(2).replace('.',',')+' €';
+      if(ci===0)kit+=line;else plv+=line;
+    });
+  });
+  document.getElementById('r-kit').textContent=kit.toFixed(2).replace('.',',')+' €';
+  document.getElementById('r-plv').textContent=plv.toFixed(2).replace('.',',')+' €';
+  document.getElementById('r-total').textContent=(kit+plv).toFixed(2).replace('.',',')+' €';
+  document.getElementById('r-total-m').textContent=(kit+plv).toFixed(2).replace('.',',')+' €';
+}
+function maj(){
+  document.getElementById('p-promo').textContent=document.getElementById('f-promo').value;
+  document.getElementById('p-date').textContent=document.getElementById('f-date').value;
+  document.getElementById('p-adr').textContent=document.getElementById('f-adr').value;
+  document.getElementById('p-hor').textContent=document.getElementById('f-hor').value;
+  document.getElementById('p-rs').textContent=document.getElementById('f-rs').value;
+}
+function bat(){
+  const s=document.getElementById('statut-bat');
+  s.innerHTML='✅ <b>BAT envoyé en validation centrale.</b> Vous serez notifié dès la décision - aucune impression sans validation.';
+  s.style.background='var(--vert-pale)';s.style.borderColor='#BFE3CB';s.style.color='#1E7A3C';
+}
+tot();
+</script>
+<script>
+// Enregistrement du service worker (PWA)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+// Bouton d'installation (Chrome / Edge / Android) ; sur iOS : Partager > Sur l'écran d'accueil
+let deferredPrompt = null;
+const btnInstall = document.getElementById('btn-install');
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; btnInstall.style.display = 'inline-block'; });
+btnInstall.addEventListener('click', async () => { if (!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; btnInstall.style.display = 'none'; });
+window.addEventListener('appinstalled', () => { btnInstall.style.display = 'none'; });
+// Liens profonds vers un onglet (#cmd, #perso, #projet) pour les raccourcis du manifest
+const hash = location.hash.replace('#', '');
+if (['dash','cmd','perso','projet'].includes(hash)) go(hash);
+</script>
+</body>
+</html>
