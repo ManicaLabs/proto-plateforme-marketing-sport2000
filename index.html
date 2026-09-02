@@ -176,6 +176,37 @@ h1{font-family:'Barlow Condensed';font-weight:700;font-size:30px;letter-spacing:
 .part .pi span{font-size:11px;color:var(--gris)}
 .alert-planning{margin-top:14px;background:var(--ambre-pale);border:1px solid #F0DCA8;border-radius:8px;padding:10px 12px;font-size:12px;color:#7A5503;line-height:1.5}
 footer{border-top:1px solid var(--ligne);padding:14px;text-align:center;font-size:11px;color:var(--gris);background:#fff}
+/* ===== Assistant IA (simulé) ===== */
+.ia-fab{position:fixed;right:22px;bottom:22px;z-index:70;width:58px;height:58px;border-radius:50%;border:none;background:var(--rouge);color:#fff;box-shadow:0 8px 24px rgba(200,16,46,.35);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;transition:transform .15s}
+.ia-fab:hover{transform:scale(1.06)}
+.ia-fab .dot{position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;background:var(--vert);border:2px solid #fff}
+body.ia-open .ia-fab{display:none}
+.ia{position:fixed;right:22px;bottom:22px;z-index:75;width:380px;max-width:calc(100vw - 24px);height:560px;max-height:calc(100vh - 44px);background:#fff;border:1px solid var(--ligne);border-radius:16px;box-shadow:0 18px 50px rgba(20,20,25,.22);display:none;flex-direction:column;overflow:hidden}
+body.ia-open .ia{display:flex}
+.ia-head{background:var(--noir);color:#fff;padding:12px 14px;display:flex;align-items:center;gap:10px}
+.ia-head .ico{width:34px;height:34px;border-radius:10px;background:var(--rouge);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.ia-head b{font-family:'Barlow Condensed';font-weight:700;font-size:16px;letter-spacing:.05em;text-transform:uppercase;display:block}
+.ia-head small{font-size:10.5px;color:#9B9CA3;display:block}
+.ia-close{margin-left:auto;background:none;border:none;color:#9B9CA3;font-size:24px;line-height:1;cursor:pointer}
+.ia-log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--fond)}
+.msg{max-width:88%;padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.45;white-space:pre-line}
+.msg.bot{background:#fff;border:1px solid var(--ligne);border-bottom-left-radius:4px;align-self:flex-start}
+.msg.user{background:var(--noir);color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+.msg .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.msg .acts button{border:1px solid var(--rouge);color:var(--rouge);background:#fff;border-radius:99px;padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter'}
+.msg .acts button:hover{background:var(--rouge);color:#fff}
+.typing{display:inline-flex;gap:4px;padding:6px 2px}
+.typing i{width:6px;height:6px;border-radius:50%;background:#B9B6B1;animation:blink 1s infinite}
+.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.ia-chips{display:flex;gap:6px;padding:8px 12px 0;flex-wrap:wrap;background:#fff;border-top:1px solid var(--ligne)}
+.ia-chips button{border:1px solid var(--ligne);background:var(--fond);border-radius:99px;padding:5px 10px;font-size:11.5px;color:var(--encre);cursor:pointer;font-family:'Inter'}
+.ia-chips button:hover{border-color:var(--rouge);color:var(--rouge)}
+.ia-input{display:flex;gap:8px;padding:10px 12px 12px;background:#fff}
+.ia-input input{flex:1;border:1px solid var(--ligne);border-radius:10px;padding:10px 12px;font-family:'Inter';font-size:13px}
+.ia-input input:focus{outline:2px solid var(--rouge);border-color:transparent}
+.ia-input button{background:var(--rouge);color:#fff;border:none;border-radius:10px;padding:0 14px;font-weight:600;cursor:pointer;font-family:'Inter'}
+.ia-note{font-size:10px;color:var(--gris);text-align:center;padding:0 12px 8px;background:#fff}
 /* ===== Menu mobile : bouton burger + tiroir ===== */
 .burger{display:none;width:40px;height:40px;border:none;border-radius:9px;background:#26272C;color:#fff;font-size:20px;line-height:1;cursor:pointer;align-items:center;justify-content:center;margin-left:auto;flex-shrink:0}
 .burger:active{background:var(--rouge)}
@@ -248,6 +279,8 @@ body.menu-open{overflow:hidden}
   .projet-head .btn{width:100%}
   .jalon .date{display:none}
   .bnav{display:flex}
+  .ia-fab{right:14px;bottom:calc(72px + env(safe-area-inset-bottom));width:52px;height:52px;font-size:21px}
+  .ia{right:0;bottom:0;left:0;width:100%;max-width:100%;height:100%;max-height:100%;border-radius:0}
   #cmd.active ~ * .cmd-bar, .cmd-bar.on{display:flex}
   .recap .btn.rouge{display:none}
 }
@@ -532,6 +565,15 @@ body.menu-open{overflow:hidden}
 </section>
 </main>
 
+<button class="ia-fab" id="ia-fab" aria-label="Ouvrir l'assistant">✦<span class="dot"></span></button>
+<section class="ia" id="ia" aria-label="Assistant">
+  <div class="ia-head"><div class="ico">✦</div><div><b>Assistant marketing</b><small>Prototype : réponses simulées, aucune donnée transmise</small></div><button class="ia-close" id="ia-close" aria-label="Fermer">×</button></div>
+  <div class="ia-log" id="ia-log"></div>
+  <div class="ia-chips" id="ia-chips"></div>
+  <form class="ia-input" id="ia-form" autocomplete="off"><input id="ia-q" placeholder="Posez votre question..." aria-label="Votre question"><button type="submit">Envoyer</button></form>
+  <div class="ia-note">Assistant intégré à la plateforme : il connaît vos opérations, vos commandes et vos échéances.</div>
+</section>
+
 <div class="cmd-bar" id="cmd-bar">
   <div class="ct"><div class="l">Total HT (indicatif)</div><div class="v" id="r-total-m">175,00 €</div></div>
   <button class="btn rouge" onclick="alert('Commande validée - confirmation envoyée par e-mail avec le détail et les CGV.')">Valider</button>
@@ -615,6 +657,68 @@ window.addEventListener('appinstalled', () => { btnInstall.style.display = 'none
 // Liens profonds vers un onglet (#cmd, #perso, #projet) pour les raccourcis du manifest
 const hash = location.hash.replace('#', '');
 if (['dash','cmd','perso','projet'].includes(hash)) go(hash);
+</script>
+<script>
+// ===== Assistant IA simulé : moteur de reponses par intentions, actions dans l'application =====
+(function(){
+  const fab=document.getElementById('ia-fab'), panel=document.getElementById('ia'), log=document.getElementById('ia-log'),
+        chips=document.getElementById('ia-chips'), form=document.getElementById('ia-form'), input=document.getElementById('ia-q');
+  const norm=t=>t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const CHIPS=['Quand ferme la fenêtre de commande ?','Créer une opération locale -20 % le 15 octobre','Combien coûte ma commande ?','Comment valider un BAT ?','Créer un projet dépliant','Le kit obligatoire, c\'est quoi ?'];
+  const MOIS={janvier:2,fevrier:3,mars:4,avril:5,mai:6,juin:7,juillet:8,aout:9,septembre:10,octobre:11,novembre:12,decembre:13};
+  function add(text,who,acts){
+    const m=document.createElement('div'); m.className='msg '+who; m.textContent=text;
+    if(acts&&acts.length){const a=document.createElement('div');a.className='acts';acts.forEach(x=>{const b=document.createElement('button');b.textContent=x.l;b.onclick=x.f;a.appendChild(b);});m.appendChild(a);}
+    log.appendChild(m); log.scrollTop=log.scrollHeight; return m;
+  }
+  function typing(){const m=document.createElement('div');m.className='msg bot';m.innerHTML='<span class="typing"><i></i><i></i><i></i></span>';log.appendChild(m);log.scrollTop=log.scrollHeight;return m;}
+  function reply(q){
+    const t=typing();
+    setTimeout(()=>{t.remove(); const r=answer(q); add(r.text,'bot',r.acts);}, 550+Math.random()*450);
+  }
+  function total(){return document.getElementById('r-total').textContent;}
+  function creerLocale(q){
+    const n=norm(q); const pct=n.match(/-?\s?(\d{1,2})\s?%/); const jour=n.match(/\b(\d{1,2})\s+(janvier|fevrier|mars|avril|mai|juin|juillet|aout|septembre|octobre|novembre|decembre)/);
+    const theme=/portes? ouvertes?/.test(n)?'Portes ouvertes':/anniv/.test(n)?'Anniversaire':/soldes?/.test(n)?'Soldes':/fete des peres/.test(n)?'Fête des pères':/rentree/.test(n)?'Rentrée':'Opération locale';
+    if(pct){const sel=document.getElementById('f-promo');const v='-'+pct[1]+' %';let ok=false;[...sel.options].forEach(o=>{if(o.text.replace(/\s/g,'')===v.replace(/\s/g,'')){sel.value=o.text;ok=true;}});if(!ok){const o=document.createElement('option');o.text=v;sel.add(o);sel.value=v;}}
+    if(jour){const d=jour[1]+' '+jour[2];document.getElementById('f-date').value=d.charAt(0).toUpperCase()+d.slice(1);}
+    if(typeof maj==='function')maj();
+    // ajoute l'operation sur la frise (ligne locales), en preparation
+    if(jour){const col=MOIS[jour[2]];const ligne=[...document.querySelectorAll('#dash .ligne-op')].pop();
+      if(ligne&&!ligne.querySelector('[data-ia]')){const op=document.createElement('div');op.className='op loc plan';op.setAttribute('data-ia','1');op.style.gridColumn=col+'/span 1';op.innerHTML=theme.toUpperCase()+'<small>Créée par l\'assistant</small>';op.onclick=()=>go('perso');ligne.appendChild(op);}}
+    const det=[theme, pct?('remise '+pct[1]+' %'):null, jour?('le '+jour[1]+' '+jour[2]):null].filter(Boolean).join(', ');
+    return {text:'C\'est préparé : '+det+'. J\'ai pré-rempli la personnalisation sur le gabarit « Affiche événement A2 »'+(jour?' et placé l\'opération sur votre frise en préparation':'')+'. Il vous reste à vérifier l\'aperçu et à l\'envoyer en validation : la centrale valide chaque BAT avant impression.',
+            acts:[{l:'Ouvrir la personnalisation',f:()=>{go('perso');closeIa();}},{l:'Voir la frise',f:()=>{go('dash');closeIa();}}]};
+  }
+  function answer(q){
+    const n=norm(q);
+    if(/(fenetre|ferme|date limite|delai|jusqu|quand).*(command|fenetre)|fenetre/.test(n))
+      return {text:'La fenêtre de commande AUTOMNE-HIVER 2027 ferme le 30 juin, dans 12 jours. Il vous reste 2 opérations obligatoires à compléter : Rentrée des classes et La Carte AH. Vous recevrez des rappels à J-7 et J-2.',acts:[{l:'Compléter mes commandes',f:()=>{go('cmd');closeIa();}}]};
+    if(/(cre|lance|prepar|ajout|nouvel).*(operation|op |promo|affiche|event|evenement|portes|anniv)|operation locale|personnalis/.test(n)) return creerLocale(q);
+    if(/(combien|cout|coute|total|prix|montant).*(command|panier)|ma commande/.test(n))
+      return {text:'Votre commande Rentrée des classes 2027 s\'élève à '+total()+' HT (affichage indicatif). Le kit PLV obligatoire est pris en charge selon les règles du pacte coopératif ; le dépliant est pris en charge par la centrale. Aucun paiement en ligne : la facturation passe par la centrale.',acts:[{l:'Voir ma commande',f:()=>{go('cmd');closeIa();}}]};
+    if(/bat|valid|relecture|epreuve/.test(n))
+      return {text:'Le BAT (bon à tirer) suit 3 étapes : 1) vous personnalisez et vérifiez l\'aperçu temps réel, 2) vous cliquez « Envoyer en validation », 3) la centrale relit et valide, vous êtes notifié. Aucune impression ne part sans cette validation. Votre BAT « Anniversaire 10 ans » est actuellement en validation.',acts:[{l:'Voir le BAT',f:()=>{go('perso');closeIa();}}]};
+    if(/projet|depliant|jalon|agence|imprimeur/.test(n))
+      return {text:'Un projet réunit tous les intervenants autour de 5 jalons : brief validé, dépôt des pages par l\'agence, relecture du BAT, validation HD, transmission des répartitions à l\'imprimeur. Les externes participent par lien sécurisé, sans compte. Pour créer un projet, la centrale renseigne le nom, l\'opération liée et l\'échéance d\'impression ; les jalons types se positionnent automatiquement.',acts:[{l:'Voir le projet Dépliant Noël',f:()=>{go('projet');closeIa();}}]};
+    if(/kit|oblig|pacte|cooperatif/.test(n))
+      return {text:'Le kit PLV obligatoire est le socle de chaque opération nationale, prévu par le pacte coopératif : étiquettes, gongoles, bandeaux podium. Si vous ne le commandez pas pendant la fenêtre, la centrale vous l\'attribue automatiquement. Le reste des supports (PLV, Akylux, stickers) est libre.',acts:[{l:'Voir le kit Rentrée',f:()=>{go('cmd');closeIa();}}]};
+    if(/objet|pub|goodies|stock|sac|tenue|oriflamme/.test(n))
+      return {text:'Les objets publicitaires (étiquettes, tenues vendeurs, oriflammes, sacs...) se commandent dans l\'espace dédié : certains partent de l\'entrepôt central, d\'autres directement du fournisseur, le bon de commande est envoyé automatiquement. Le service marketing est alerté quand un stock passe sous son seuil.',acts:[]};
+    if(/livr|suivi|statut|etat|expedi|ou en est/.test(n))
+      return {text:'Chaque commande passe par les statuts Brouillon, Validée, En production, Expédiée, Livrée. Vous êtes notifié à chaque changement (e-mail et notification sur l\'application). Vos 5 commandes du semestre sont toutes validées ; la Rentrée des classes est encore en brouillon.',acts:[{l:'Tableau de bord',f:()=>{go('dash');closeIa();}}]};
+    if(/bonjour|salut|merci|hello/.test(n))
+      return {text:'Avec plaisir. Je peux vous aider à compléter vos commandes, préparer une opération locale, suivre un BAT ou un projet. Que souhaitez-vous faire ?',acts:[]};
+    return {text:'Je n\'ai pas encore la réponse à cette question dans le prototype. Voici ce que je sais faire : compléter une commande, créer une opération locale (dites-moi la remise et la date), expliquer le kit obligatoire, suivre un BAT ou un projet.',acts:[{l:'Créer une opération locale',f:()=>ask('Créer une opération locale -20 % le 15 octobre')}]};
+  }
+  function ask(q){ if(!q.trim())return; add(q,'user'); input.value=''; reply(q); }
+  function openIa(){document.body.classList.add('ia-open');if(!log.children.length){add('Bonjour Grenoble Échirolles. Je suis l\'assistant de la plateforme : je connais vos opérations, vos commandes et vos échéances. Comment puis-je vous aider ?','bot');}setTimeout(()=>input.focus(),50);}
+  function closeIa(){document.body.classList.remove('ia-open');}
+  CHIPS.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.onclick=()=>ask(c);chips.appendChild(b);});
+  fab.addEventListener('click',openIa); document.getElementById('ia-close').addEventListener('click',closeIa);
+  form.addEventListener('submit',e=>{e.preventDefault();ask(input.value);});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeIa();});
+})();
 </script>
 </body>
 </html>

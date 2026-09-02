@@ -43,6 +43,8 @@ Le prototype doit être installable (PWA) et fonctionner hors ligne après la pr
 
 ## 4. Détails à ne pas régresser
 
+- Assistant : 100 % local et scripté (aucun appel réseau, fonctionne hors ligne), étiqueté « réponses simulées ». Moteur `answer(q)` par expressions régulières sur le texte normalisé (sans accents) ; `creerLocale(q)` extrait la remise (`NN %`) et la date (`JJ mois`) pour pré-remplir `#f-promo` / `#f-date`, appelle `maj()` et ajoute une opération `.op.loc.plan[data-ia]` sur la dernière ligne de la frise. Une seule opération créée par session (garde `data-ia`).
+
 - Charte : rouge `#D8121F`, noir `#17181C`, bandeau hachuré `.stripe` sous l'en-tête ; opérations locales en bleu `#1E5AA8` (pointillé = en préparation).
 - Frise : grille 12 colonnes (`grid-column: N/span M`), `min-width: 920px` en mobile pour défilement horizontal.
 - Commande : `tot()` recalcule kit / PLV / total (desktop et barre mobile `#r-total-m`) ; avertissement d'attribution automatique du kit obligatoire.
@@ -53,11 +55,14 @@ Le prototype doit être installable (PWA) et fonctionner hors ligne après la pr
 
 - ✅ v1.0 : 4 écrans, responsive, PWA installable, hors ligne, icônes, manifest, README.
 - ✅ v1.1 : URL de publication dans README et CDC.
+- ✅ v1.3 : assistant IA simulé (bouton ✦, panneau de conversation, 9 intentions par mots-clés, actions dans l'app : navigation, pré-remplissage de la personnalisation, création d'une opération locale sur la frise, lecture du total) ; SW `pm-proto-v3`.
 - ✅ v1.2 : navigation mobile robuste (menu ☰ + tiroir, titre d'écran, barre basse conservée) ; SW `pm-proto-v2`.
 - 🚧 Rien en cours.
 - ⚠️ Aucune anomalie connue. Pas de capture de l'écran suivi de projet dans les documents d'offre (seulement dans l'app).
 
 ## 6. Prochain périmètre (si retenu)
+
+- Assistant : brancher un vrai modèle (API) avec le contexte du magasin (opérations, commandes, échéances) ; création guidée de projets et de commandes par dialogue.
 
 - Écran centrale (back-office) : liste des magasins n'ayant pas commandé, extraction par imprimeur.
 - Mode « Voir en tant que » (assistance centrale).
