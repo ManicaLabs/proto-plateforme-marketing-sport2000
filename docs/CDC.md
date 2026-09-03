@@ -35,7 +35,7 @@ Le prototype doit être installable (PWA) et fonctionner hors ligne après la pr
 
 ## 3. Architecture actuelle (v1, en prod)
 
-- Écrans : `#dash` (frise 2027, KPI, bandeau J-12), `#cmd` (Rentrée des classes 2027 : kit obligatoire, PLV, questionnaire, total au fil de l'eau), `#perso` (Anniversaire 10 ans : champs à gauche, aperçu temps réel à droite, envoi BAT), `#projet` (Dépliant Noël : 5 jalons, relecture BAT v3, intervenants).
+- Écrans : `#boutique` (objets pub : `totB()` calcule les sous-totaux par circuit `data-circ` et la jauge franco), `#dash` (frise 2027, KPI, bandeau J-12), `#cmd` (Rentrée des classes 2027 : kit obligatoire, PLV, questionnaire, total au fil de l'eau), `#perso` (Anniversaire 10 ans : champs à gauche, aperçu temps réel à droite, envoi BAT), `#projet` (Dépliant Noël : 5 jalons, relecture BAT v3, intervenants).
 - Navigation : `go(id)` bascule les sections `.screen` et synchronise les trois menus. Desktop : barre haute. Mobile (< 760 px) : bouton ☰ dans l'en-tête ouvrant un tiroir latéral (`.drawer`, 4 écrans avec descriptions, bouton d'installation, fermeture par ×, fond ou Échap), titre de l'écran courant dans l'en-tête (`#mob-title`), barre d'onglets basse `.bnav` en accès rapide, barre `#cmd-bar` collante sur l'écran commande.
 - État : en mémoire uniquement (aucun `localStorage`), tout est réinitialisé au rechargement. C'est volontaire.
 - PWA : enregistrement `sw.js` au `load` ; bouton `#btn-install` affiché sur `beforeinstallprompt` (Android / Chrome / Edge) ; iOS passe par Partager > Sur l'écran d'accueil.
@@ -55,6 +55,7 @@ Le prototype doit être installable (PWA) et fonctionner hors ligne après la pr
 
 - ✅ v1.0 : 4 écrans, responsive, PWA installable, hors ligne, icônes, manifest, README.
 - ✅ v1.1 : URL de publication dans README et CDC.
+- ✅ v1.4 : écran Objets publicitaires (boutique : 6 produits, circuits entrepôt / fournisseur, conditionnements, repiquage, alerte stock, panier par circuit avec franco fournisseur 150 €) ; 5e onglet dans les trois menus ; SW `pm-proto-v4`.
 - ✅ v1.3 : assistant IA simulé (bouton ✦, panneau de conversation, 9 intentions par mots-clés, actions dans l'app : navigation, pré-remplissage de la personnalisation, création d'une opération locale sur la frise, lecture du total) ; SW `pm-proto-v3`.
 - ✅ v1.2 : navigation mobile robuste (menu ☰ + tiroir, titre d'écran, barre basse conservée) ; SW `pm-proto-v2`.
 - 🚧 Rien en cours.

@@ -176,6 +176,26 @@ h1{font-family:'Barlow Condensed';font-weight:700;font-size:30px;letter-spacing:
 .part .pi span{font-size:11px;color:var(--gris)}
 .alert-planning{margin-top:14px;background:var(--ambre-pale);border:1px solid #F0DCA8;border-radius:8px;padding:10px 12px;font-size:12px;color:#7A5503;line-height:1.5}
 footer{border-top:1px solid var(--ligne);padding:14px;text-align:center;font-size:11px;color:var(--gris);background:#fff}
+/* ===== Boutique objets publicitaires ===== */
+.filtres{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
+.filtres button{border:1px solid var(--ligne);background:#fff;border-radius:99px;padding:6px 13px;font-size:12.5px;font-weight:600;color:var(--encre);cursor:pointer;font-family:'Inter'}
+.filtres button.active{background:var(--noir);color:#fff;border-color:var(--noir)}
+.prod-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.prod{padding:14px;display:flex;flex-direction:column;gap:8px}
+.prod .vis{height:74px;border-radius:8px;background:#EDEBE8;display:flex;align-items:center;justify-content:center;color:#B9B6B1;font-size:11px;font-weight:700;letter-spacing:.04em}
+.prod b{font-size:13.5px}
+.prod .meta{display:flex;gap:6px;flex-wrap:wrap;margin:0}
+.prod .desc{font-size:11.5px;color:var(--gris);line-height:1.4}
+.prod .bas{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}
+.prod .pu{font-size:12px;color:var(--gris)}
+.prod .pu b{font-size:13px;color:var(--encre)}
+.chip.ent{background:#E7F5EC;color:#1E7A3C}
+.chip.four{background:var(--local-pale);color:var(--local)}
+.chip.alerte{background:#FBE8EA;color:var(--rouge-fonce)}
+.franco{margin-top:10px;background:var(--fond);border-radius:8px;padding:10px 12px;font-size:12px}
+.franco .bar{height:6px;border-radius:99px;background:#E0DEDA;margin-top:7px;overflow:hidden}
+.franco .bar i{display:block;height:100%;background:var(--local);border-radius:99px;transition:width .2s}
+@media(max-width:760px){.prod-grid{grid-template-columns:1fr}}
 /* ===== Assistant IA (simulé) ===== */
 .ia-fab{position:fixed;right:22px;bottom:22px;z-index:70;width:58px;height:58px;border-radius:50%;border:none;background:var(--rouge);color:#fff;box-shadow:0 8px 24px rgba(200,16,46,.35);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;transition:transform .15s}
 .ia-fab:hover{transform:scale(1.06)}
@@ -293,6 +313,7 @@ body.menu-open{overflow:hidden}
   <nav>
     <button class="active" data-s="dash">Tableau de bord</button>
     <button data-s="cmd">Commander</button>
+    <button data-s="boutique">Objets pub</button>
     <button data-s="perso">Personnaliser</button>
     <button data-s="projet">Suivi de projet</button>
   </nav>
@@ -311,7 +332,8 @@ body.menu-open{overflow:hidden}
   </div>
   <nav class="drawer-list">
     <button class="active" data-s="dash"><span class="ic">▦</span><span class="tx"><b>Tableau de bord</b><small>Frise 2027, rappels, commandes à compléter</small></span></button>
-    <button data-s="cmd"><span class="ic">🛒</span><span class="tx"><b>Commander</b><small>Opérations nationales et objets publicitaires</small></span></button>
+    <button data-s="cmd"><span class="ic">🛒</span><span class="tx"><b>Commander</b><small>Supports des opérations nationales</small></span></button>
+    <button data-s="boutique"><span class="ic">⬢</span><span class="tx"><b>Objets publicitaires</b><small>Boutique : étiquettes, tenues, oriflammes, sacs</small></span></button>
     <button data-s="perso"><span class="ic">✎</span><span class="tx"><b>Personnaliser</b><small>Supports locaux, prévisualisation, BAT</small></span></button>
     <button data-s="projet"><span class="ic">◷</span><span class="tx"><b>Suivi de projet</b><small>Jalons, relecture, intervenants</small></span></button>
   </nav>
@@ -463,6 +485,38 @@ body.menu-open{overflow:hidden}
   </div>
 </section>
 
+<!-- ============ BOUTIQUE OBJETS PUB ============ -->
+<section class="screen" id="boutique">
+  <h1>Objets publicitaires - Boutique</h1>
+  <div class="sub">Commandez les objets de votre enseigne : certains partent de l'entrepôt central, d'autres directement du fournisseur. Bon de commande envoyé automatiquement.</div>
+  <div class="filtres">
+    <button class="active">Toutes les catégories</button><button>Étiquetage</button><button>Tenues vendeurs</button><button>Oriflammes &amp; drapeaux</button><button>Sacs &amp; emballages</button>
+  </div>
+  <div class="commande-grid">
+    <div class="prod-grid">
+      <div class="card prod"><div class="vis">ÉTIQUETTES</div><b>Étiquettes prix repositionnables</b><div class="meta"><span class="chip ent">Entrepôt central</span><span class="chip gris">Par 500</span></div><div class="desc">Rouleau de 500 étiquettes 40 × 25 mm, charte Sport 2000. Disponibilité immédiate.</div><div class="bas"><span class="pu"><b>12,00 €</b> / rouleau</span><div class="qty"><button onclick="qb(this,-1)">−</button><input value="2" data-pu="12" data-circ="ent" onchange="totB()"><button onclick="qb(this,1)">+</button></div></div></div>
+      <div class="card prod"><div class="vis">TENUE</div><b>Polo vendeur brodé Sport 2000</b><div class="meta"><span class="chip four">Direct fournisseur</span><span class="chip gris">Par 5</span><span class="chip loc">Repiquage possible</span></div><div class="desc">Polo technique noir, logo brodé poitrine. Repiquage du nom du magasin au dos.</div><div class="bas"><span class="pu"><b>18,50 €</b> / unité</span><div class="qty"><button onclick="qb(this,-1)">−</button><input value="5" data-pu="18.5" data-circ="four" onchange="totB()"><button onclick="qb(this,1)">+</button></div></div></div>
+      <div class="card prod"><div class="vis">ORIFLAMME</div><b>Oriflamme extérieure 3 m « Passion sport »</b><div class="meta"><span class="chip four">Direct fournisseur</span><span class="chip gris">Unité</span></div><div class="desc">Voile 80 × 300 cm avec mât fibre et pied. Livraison 10 jours ouvrés.</div><div class="bas"><span class="pu"><b>89,00 €</b> / unité</span><div class="qty"><button onclick="qb(this,-1)">−</button><input value="0" data-pu="89" data-circ="four" onchange="totB()"><button onclick="qb(this,1)">+</button></div></div></div>
+      <div class="card prod"><div class="vis">SACS</div><b>Sac kraft anses torsadées</b><div class="meta"><span class="chip ent">Entrepôt central</span><span class="chip gris">Par 250</span><span class="chip alerte">⚠ Stock bas</span></div><div class="desc">Carton de 250 sacs 32 × 40 cm, impression 2 couleurs. Alerte stock envoyée au service marketing.</div><div class="bas"><span class="pu"><b>62,00 €</b> / carton</span><div class="qty"><button onclick="qb(this,-1)">−</button><input value="1" data-pu="62" data-circ="ent" onchange="totB()"><button onclick="qb(this,1)">+</button></div></div></div>
+      <div class="card prod"><div class="vis">DRAPEAU</div><b>Drapeau de façade 100 × 150</b><div class="meta"><span class="chip ent">Entrepôt central</span><span class="chip gris">Unité</span></div><div class="desc">Maille polyester, œillets renforcés. Logo enseigne recto verso.</div><div class="bas"><span class="pu"><b>34,00 €</b> / unité</span><div class="qty"><button onclick="qb(this,-1)">−</button><input value="0" data-pu="34" data-circ="ent" onchange="totB()"><button onclick="qb(this,1)">+</button></div></div></div>
+      <div class="card prod"><div class="vis">BADGES</div><b>Badges prénom vendeurs</b><div class="meta"><span class="chip four">Direct fournisseur</span><span class="chip gris">Par 10</span><span class="chip loc">Repiquage possible</span></div><div class="desc">Badges magnétiques gravés, liste des prénoms saisie à la commande.</div><div class="bas"><span class="pu"><b>4,20 €</b> / badge</span><div class="qty"><button onclick="qb(this,-1)">−</button><input value="0" data-pu="4.2" data-circ="four" onchange="totB()"><button onclick="qb(this,1)">+</button></div></div></div>
+    </div>
+    <div class="card recap">
+      <div class="in">
+        <h3>Mon panier objets pub</h3>
+        <div class="row"><span>Entrepôt central</span><b id="b-ent">0,00 €</b></div>
+        <div class="row"><span>Direct fournisseur</span><b id="b-four">0,00 €</b></div>
+        <div class="row"><span>Livraison</span><b>Adresse principale</b></div>
+        <div class="total"><span>Total HT</span><span class="v" id="b-total">0,00 €</span></div>
+        <div class="franco"><span id="b-franco-txt">Franco fournisseur</span><div class="bar"><i id="b-franco-bar" style="width:0%"></i></div></div>
+        <div class="note">Entrepôt : expédition sous 48 h. Fournisseur : bon de commande envoyé automatiquement au prestataire, franco de port à partir de 150 € HT.</div>
+        <button class="btn rouge" onclick="alert('Commande validée. Bons de commande générés : 1 vers l\'entrepôt central, 1 vers le fournisseur. Confirmation envoyée par e-mail.')">Valider ma commande</button>
+        <button class="btn ghost">Enregistrer le brouillon</button>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ PERSONNALISATION ============ -->
 <section class="screen" id="perso">
   <h1>Personnaliser - Anniversaire 10 ans</h1>
@@ -582,6 +636,7 @@ body.menu-open{overflow:hidden}
 <nav class="bnav" aria-label="Navigation principale mobile">
   <button class="active" data-s="dash"><span class="ic">▦</span><span class="tx">Accueil</span></button>
   <button data-s="cmd"><span class="ic">🛒</span><span class="tx">Commander</span></button>
+  <button data-s="boutique"><span class="ic">⬢</span><span class="tx">Objets pub</span></button>
   <button data-s="perso"><span class="ic">✎</span><span class="tx">Personnaliser</span></button>
   <button data-s="projet"><span class="ic">◷</span><span class="tx">Projets</span></button>
 </nav>
@@ -589,7 +644,7 @@ body.menu-open{overflow:hidden}
 <footer>Prototype PWA - Plateforme collaborative marketing Sport 2000 · Réponse AO 2026 · Écrans non contractuels<br>Application installable sur smartphone et tablette · notifications push · consultation et commande en mobilité</footer>
 
 <script>
-const TITRES={dash:'Tableau de bord',cmd:'Commander',perso:'Personnaliser',projet:'Suivi de projet'};
+const TITRES={dash:'Tableau de bord',cmd:'Commander',boutique:'Objets publicitaires',perso:'Personnaliser',projet:'Suivi de projet'};
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -626,6 +681,17 @@ function tot(){
   document.getElementById('r-total').textContent=(kit+plv).toFixed(2).replace('.',',')+' €';
   document.getElementById('r-total-m').textContent=(kit+plv).toFixed(2).replace('.',',')+' €';
 }
+function qb(btn,delta){const i=btn.parentElement.querySelector('input');i.value=Math.max(0,parseInt(i.value||0)+delta);totB();}
+function eur(v){return v.toFixed(2).replace('.',',')+' €';}
+function totB(){
+  let ent=0,four=0;
+  document.querySelectorAll('#boutique input[data-pu]').forEach(i=>{const l=parseInt(i.value||0)*parseFloat(i.dataset.pu); if(i.dataset.circ==='ent')ent+=l; else four+=l;});
+  document.getElementById('b-ent').textContent=eur(ent); document.getElementById('b-four').textContent=eur(four); document.getElementById('b-total').textContent=eur(ent+four);
+  const F=150, p=Math.min(100,Math.round(four/F*100));
+  document.getElementById('b-franco-bar').style.width=p+'%';
+  document.getElementById('b-franco-txt').textContent= four>=F ? 'Franco fournisseur atteint : port offert ✓' : ('Franco fournisseur : il manque '+eur(F-four)+' pour le port offert');
+}
+totB();
 function maj(){
   document.getElementById('p-promo').textContent=document.getElementById('f-promo').value;
   document.getElementById('p-date').textContent=document.getElementById('f-date').value;
@@ -656,7 +722,7 @@ btnInstallM.addEventListener('click', installer);
 window.addEventListener('appinstalled', () => { btnInstall.style.display = 'none'; btnInstallM.style.display = 'none'; });
 // Liens profonds vers un onglet (#cmd, #perso, #projet) pour les raccourcis du manifest
 const hash = location.hash.replace('#', '');
-if (['dash','cmd','perso','projet'].includes(hash)) go(hash);
+if (['dash','cmd','boutique','perso','projet'].includes(hash)) go(hash);
 </script>
 <script>
 // ===== Assistant IA simulé : moteur de reponses par intentions, actions dans l'application =====
@@ -664,7 +730,7 @@ if (['dash','cmd','perso','projet'].includes(hash)) go(hash);
   const fab=document.getElementById('ia-fab'), panel=document.getElementById('ia'), log=document.getElementById('ia-log'),
         chips=document.getElementById('ia-chips'), form=document.getElementById('ia-form'), input=document.getElementById('ia-q');
   const norm=t=>t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  const CHIPS=['Quand ferme la fenêtre de commande ?','Créer une opération locale -20 % le 15 octobre','Combien coûte ma commande ?','Comment valider un BAT ?','Créer un projet dépliant','Le kit obligatoire, c\'est quoi ?'];
+  const CHIPS=['Quand ferme la fenêtre de commande ?','Commander des sacs et des tenues vendeurs','Créer une opération locale -20 % le 15 octobre','Combien coûte ma commande ?','Comment valider un BAT ?','Créer un projet dépliant','Le kit obligatoire, c\'est quoi ?'];
   const MOIS={janvier:2,fevrier:3,mars:4,avril:5,mai:6,juin:7,juillet:8,aout:9,septembre:10,octobre:11,novembre:12,decembre:13};
   function add(text,who,acts){
     const m=document.createElement('div'); m.className='msg '+who; m.textContent=text;
@@ -704,7 +770,7 @@ if (['dash','cmd','perso','projet'].includes(hash)) go(hash);
     if(/kit|oblig|pacte|cooperatif/.test(n))
       return {text:'Le kit PLV obligatoire est le socle de chaque opération nationale, prévu par le pacte coopératif : étiquettes, gongoles, bandeaux podium. Si vous ne le commandez pas pendant la fenêtre, la centrale vous l\'attribue automatiquement. Le reste des supports (PLV, Akylux, stickers) est libre.',acts:[{l:'Voir le kit Rentrée',f:()=>{go('cmd');closeIa();}}]};
     if(/objet|pub|goodies|stock|sac|tenue|oriflamme/.test(n))
-      return {text:'Les objets publicitaires (étiquettes, tenues vendeurs, oriflammes, sacs...) se commandent dans l\'espace dédié : certains partent de l\'entrepôt central, d\'autres directement du fournisseur, le bon de commande est envoyé automatiquement. Le service marketing est alerté quand un stock passe sous son seuil.',acts:[]};
+      return {text:'Les objets publicitaires (étiquettes, tenues vendeurs, oriflammes, sacs...) se commandent dans l\'espace dédié : certains partent de l\'entrepôt central, d\'autres directement du fournisseur, le bon de commande est envoyé automatiquement. Le service marketing est alerté quand un stock passe sous son seuil.',acts:[{l:'Ouvrir la boutique',f:()=>{go('boutique');closeIa();}}]};
     if(/livr|suivi|statut|etat|expedi|ou en est/.test(n))
       return {text:'Chaque commande passe par les statuts Brouillon, Validée, En production, Expédiée, Livrée. Vous êtes notifié à chaque changement (e-mail et notification sur l\'application). Vos 5 commandes du semestre sont toutes validées ; la Rentrée des classes est encore en brouillon.',acts:[{l:'Tableau de bord',f:()=>{go('dash');closeIa();}}]};
     if(/bonjour|salut|merci|hello/.test(n))
