@@ -222,14 +222,36 @@ table.tbl tr:nth-child(even) td{background:var(--fond)}
 .compteur{font-size:11px;color:var(--gris);text-align:right;margin-top:-8px;margin-bottom:10px}
 @media(max-width:760px){.admin-grid{grid-template-columns:1fr}.row2{grid-template-columns:1fr}.affiche.vitro{width:100%}}
 /* ===== Editeur de gabarit ===== */
-.gab-editor-grid{display:grid;grid-template-columns:1fr 300px;gap:16px;margin-top:14px;align-items:start}
+.gab-editor-grid{display:grid;grid-template-columns:230px 1fr 300px;gap:16px;margin-top:14px;align-items:start}
 #gab-canvas{position:relative;width:100%;background:#fff no-repeat center/cover;border:1px solid var(--ligne);overflow:hidden;touch-action:none}
 .gab-el{position:absolute;box-sizing:border-box;border:1px dashed transparent;cursor:move;overflow:hidden;display:flex;line-height:1.15;padding:1px}
 .gab-el.sel{border-color:var(--rouge)}
+.gab-el.gab-masque{opacity:.35;border-style:dashed;border-color:var(--gris)}
+.gab-el.gab-verrou{cursor:not-allowed}
 .gab-el.photo-vide{align-items:center;justify-content:center;background:#EDEBE8;color:#B9B6B1;font-size:10.5px;font-weight:600}
 .gab-handle{position:absolute;right:-6px;bottom:-6px;width:13px;height:13px;background:var(--rouge);border:2px solid #fff;border-radius:3px;cursor:se-resize;z-index:2}
 .gab-props-empty{font-size:12.5px;color:var(--gris)}
+@media(max-width:1024px){.gab-editor-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){.gab-editor-grid{grid-template-columns:1fr}}
+/* panneau gauche : calques / bibliotheque */
+.gab-panneau-gauche{padding:0 0 14px}
+.gab-calques-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 14px 10px}
+.gab-calques-actions .btn{padding:8px 6px;font-size:12px}
+.gab-calques-liste{max-height:420px;overflow-y:auto;border-top:1px solid var(--ligne)}
+.gab-calque-groupe{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 14px;background:var(--fond);font-size:11.5px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:.03em}
+.gab-calque-ligne{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--ligne);cursor:pointer}
+.gab-calque-ligne:hover{background:var(--fond)}
+.gab-calque-ligne.sel{background:#FBE8EA}
+.gab-calque-ligne.groupe-membre{padding-left:22px}
+.gab-calque-ic{width:20px;flex-shrink:0;text-align:center;font-size:12px;color:var(--gris)}
+.gab-calque-nom{flex:1;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gab-calque-rename{flex:1;font-size:12.5px;border:1px solid var(--rouge);border-radius:5px;padding:2px 5px;font-family:'Inter'}
+.gab-calque-btn{background:none;border:none;cursor:pointer;font-size:12px;padding:2px 3px;line-height:1;flex-shrink:0;opacity:.6}
+.gab-calque-btn:hover{opacity:1}
+.gab-biblio-grille{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 14px 0}
+.gab-biblio-item{display:flex;flex-direction:column;gap:6px;border:1px solid var(--ligne);border-radius:8px;padding:8px;background:#fff;cursor:pointer;font-size:11px;color:var(--encre);font-family:'Inter'}
+.gab-biblio-item:hover{border-color:var(--rouge)}
+.gab-biblio-swatch{height:44px;border-radius:5px;font-size:10px;font-weight:700;overflow:hidden}
 /* rendu dynamique d'un gabarit personnalise dans Personnaliser */
 #affiche-custom{position:absolute;inset:0;display:none;background:#fff no-repeat center/cover}
 .affiche.custom-active .creat,.affiche.custom-active .zone{display:none}
@@ -761,21 +783,30 @@ body.menu-open{overflow:hidden}
   <div class="sous" id="sous-gab">
     <div class="card form">
       <h3>Éditeur de gabarit</h3>
-      <div class="s">Chargez un fond, posez des rectangles, des cercles et des zones (texte ou photo), réglez leur police, taille et couleur. Publié, le gabarit devient sélectionnable dans Personnaliser avec un rendu et un export fidèles à ce que vous composez ici.</div>
+      <div class="s">Chargez un fond, composez avec des calques (formes, zones, éléments de charte), réglez leur police, taille et couleur. Publié, le gabarit devient sélectionnable dans Personnaliser avec un rendu et un export fidèles à ce que vous composez ici.</div>
       <div class="row2">
         <div class="field"><label>Nom du gabarit</label><input id="gab-nom" placeholder="ex. Affiche Portes ouvertes A2"></div>
         <div class="field"><label>Format</label><select id="gab-fmt" onchange="gabAppliquerFormat()"><option value="a2">A2 portrait</option><option value="a5">A5 portrait</option><option value="vitro">Vitrophanie 100 × 50</option></select></div>
       </div>
       <div class="field"><label>Fond (image)</label><input type="file" id="gab-bg-input" accept="image/*" onchange="gabChargerFond(this)"></div>
-      <div class="checks" style="margin-top:2px">
-        <button class="btn ghost" type="button" onclick="gabAjouterElement('rect')">+ Rectangle</button>
-        <button class="btn ghost" type="button" onclick="gabAjouterElement('cercle')">+ Cercle</button>
-        <button class="btn ghost" type="button" onclick="gabAjouterElement('zone')">+ Zone</button>
-        <button class="btn ghost" type="button" onclick="gabAjouterElement('prix')">+ Prix</button>
-        <button class="btn ghost" type="button" onclick="gabSupprimerSelection()">Supprimer l'élément sélectionné</button>
-      </div>
     </div>
     <div class="gab-editor-grid">
+      <div class="card gab-panneau-carte" style="padding:0">
+        <div class="onglets" id="gab-onglets-gauche" style="margin:14px 14px 10px">
+          <button class="active" data-gt="calques" onclick="gabPanneauGauche('calques')">Calques</button>
+          <button data-gt="biblio" onclick="gabPanneauGauche('biblio')">Bibliothèque</button>
+        </div>
+        <div id="gab-panneau-calques" class="gab-panneau-gauche"></div>
+        <div id="gab-panneau-biblio" class="gab-panneau-gauche" style="display:none">
+          <div class="field" style="padding:0 14px"><label>Enseigne</label>
+            <select id="gab-biblio-ens" onchange="gabRenderBiblio()">
+              <option>Sport 2000</option><option>Sport 2000 Montagne</option><option>Mondovelo</option><option>S2 Sneakers</option>
+            </select>
+          </div>
+          <div class="s" style="padding:8px 14px 0">Éléments à la charte de l'enseigne sélectionnée. Cliquez pour ajouter un calque prérempli sur le gabarit.</div>
+          <div id="gab-biblio-grille" class="gab-biblio-grille"></div>
+        </div>
+      </div>
       <div class="card" style="padding:16px">
         <div id="gab-canvas"></div>
         <div class="s" style="margin-top:10px">Cliquez un élément pour le sélectionner, glissez pour le déplacer, tirez la poignée rouge pour le redimensionner.</div>
@@ -1091,8 +1122,22 @@ const GAB_CANVAS_PX={a2:1000,a5:1000,vitro:1400};
 const GAB_CHAMP_LABEL={remise:'Pourcentage de remise',date:"Date de l'événement",adresse:'Adresse du magasin',horaires:'Horaires',reseaux:'Réseaux sociaux',accroche:'Accroche locale',photo:'Photo locale',libre:'Texte libre (fixe)'};
 const GAB_SAMPLE={remise:'-30 %',date:'Samedi 18 septembre',adresse:'14 av. de Grugliasco, Échirolles',horaires:'9h30 - 19h30',reseaux:'@votremagasin',accroche:'Votre accroche locale ici'};
 const GABARITS_CUSTOM=[];
+const TYPE_LABEL={rect:'Rectangle',cercle:'Cercle',zone:'Zone',prix:'Prix'};
+const ENSEIGNE_CHARTE={
+  'Sport 2000':{couleur:'#D8121F',couleur2:'#17181C'},
+  'Sport 2000 Montagne':{couleur:'#1B4B6B',couleur2:'#17181C'},
+  'Mondovelo':{couleur:'#2E7D46',couleur2:'#17181C'},
+  'S2 Sneakers':{couleur:'#E8622C',couleur2:'#17181C'},
+};
+const GAB_BIBLIO_LABEL={logo:'Logo',bandeau:'Bandeau de couleur',prix:'Étiquette prix',cadre:'Cadre décoratif'};
+const GAB_BIBLIO={
+  logo:(ens,ch)=>({type:'zone',champ:'libre',texte:ens,police:'Barlow Condensed',taille:22,couleur:ch.couleur,align:'center',gras:true,w:35,h:12}),
+  bandeau:(ens,ch)=>({type:'rect',couleur:ch.couleur,opacite:1,bordureCouleur:ch.couleur2,bordureEpaisseur:0,radius:0,w:60,h:8}),
+  prix:(ens,ch)=>({type:'prix',entier:'19',centimes:'90',devise:'€',devisePosition:'apres',centimesStyle:'exposant',police:'Barlow Condensed',tailleEntier:36,couleur:ch.couleur,gras:true,align:'left',w:30,h:15}),
+  cadre:(ens,ch)=>({type:'rect',couleur:ch.couleur2,opacite:0,bordureCouleur:ch.couleur,bordureEpaisseur:4,radius:10,w:40,h:25}),
+};
 let GAB_SEQ=0;
-let gabState={fond:null,elements:[],selected:null};
+let gabState={fond:null,elements:[],selected:null,multiSel:[],groupes:[]};
 let gabDrag=null;
 function gabAppliquerFormat(){
   const fmt=document.getElementById('gab-fmt').value, mm=MM_FORMAT[fmt], c=document.getElementById('gab-canvas');
@@ -1102,29 +1147,96 @@ function gabChargerFond(inp){
   const f=inp.files&&inp.files[0]; if(!f)return;
   const r=new FileReader(); r.onload=e=>{gabState.fond=e.target.result; gabRenderCanvas();}; r.readAsDataURL(f);
 }
+function gabNomParDefaut(type){
+  const n=gabState.elements.filter(e=>e.type===type).length+1;
+  return TYPE_LABEL[type]+' '+n;
+}
 function gabAjouterElement(type){
   const id='el'+(++GAB_SEQ); const n=gabState.elements.length;
-  const el={id,type,x:10+(n*9)%60,y:10+(n*13)%55,w:35,h:(type==='zone'||type==='prix')?15:20};
+  const el={id,type,nom:gabNomParDefaut(type),visible:true,verrou:false,groupe:null,x:10+(n*9)%60,y:10+(n*13)%55,w:35,h:(type==='zone'||type==='prix')?15:20};
   if(type==='rect'){el.couleur='#D8121F';el.opacite=1;el.bordureCouleur='#17181C';el.bordureEpaisseur=0;el.radius=0;}
   else if(type==='cercle'){el.couleur='#17181C';el.opacite=1;el.bordureCouleur='#17181C';el.bordureEpaisseur=0;}
   else if(type==='prix'){el.entier='19';el.centimes='90';el.devise='€';el.devisePosition='apres';el.centimesStyle='exposant';el.police='Barlow Condensed';el.tailleEntier=40;el.couleur='#D8121F';el.gras=true;el.align='left';}
   else {el.champ='accroche';el.texte='Votre texte';el.police='Inter';el.taille=16;el.couleur='#17181C';el.align='left';el.gras=false;}
   gabState.elements.push(el); gabSelectionner(id);
 }
-function gabDeplacerZ(dir){
-  const arr=gabState.elements, i=arr.findIndex(e=>e.id===gabState.selected); if(i<0)return;
+function gabAjouterDepuisBiblio(cle){
+  const ens=document.getElementById('gab-biblio-ens').value, ch=ENSEIGNE_CHARTE[ens];
+  const id='el'+(++GAB_SEQ); const n=gabState.elements.length;
+  const preset=GAB_BIBLIO[cle](ens,ch);
+  const el=Object.assign({id,nom:GAB_BIBLIO_LABEL[cle]+' '+ens,visible:true,verrou:false,groupe:null,x:10+(n*9)%60,y:10+(n*13)%55},preset);
+  gabState.elements.push(el); gabSelectionner(id);
+  toast('Élément « '+el.nom+' » ajouté depuis la bibliothèque');
+}
+function gabDeplacerZid(id,dir){
+  const arr=gabState.elements, i=arr.findIndex(e=>e.id===id); if(i<0)return;
   if(dir==='up'&&i<arr.length-1){[arr[i],arr[i+1]]=[arr[i+1],arr[i]];}
   else if(dir==='down'&&i>0){[arr[i],arr[i-1]]=[arr[i-1],arr[i]];}
   else if(dir==='front'){arr.push(arr.splice(i,1)[0]);}
   else if(dir==='back'){arr.unshift(arr.splice(i,1)[0]);}
-  gabRenderCanvas();
+  gabRenderCanvas(); gabRenderCalques();
 }
+function gabDeplacerZ(dir){ gabDeplacerZid(gabState.selected,dir); }
 function gabSupprimerSelection(){
   if(!gabState.selected)return;
   gabState.elements=gabState.elements.filter(e=>e.id!==gabState.selected); gabState.selected=null;
-  gabRenderCanvas(); gabRenderProps();
+  gabRenderCanvas(); gabRenderProps(); gabRenderCalques();
 }
-function gabSelectionner(id){ gabState.selected=id; gabRenderCanvas(); gabRenderProps(); }
+function gabSelectionner(id){ gabState.selected=id; gabState.multiSel=[]; gabRenderCanvas(); gabRenderProps(); gabRenderCalques(); }
+// ---------- calques : groupes et actions de masse ----------
+function gabGrouperSelection(){
+  const ids=gabState.multiSel||[]; if(ids.length<2){ toast('Cochez au moins 2 calques pour les grouper'); return; }
+  const gid='grp'+(++GAB_SEQ);
+  gabState.groupes.push({id:gid,nom:'Groupe '+(gabState.groupes.length+1)});
+  ids.forEach(id=>{const el=gabState.elements.find(e=>e.id===id); if(el)el.groupe=gid;});
+  gabState.multiSel=[]; gabRenderCanvas(); gabRenderCalques(); gabRenderProps();
+  toast('Groupe créé (' +ids.length+' calques)');
+}
+function gabDegrouper(gid){
+  gabState.elements.forEach(e=>{if(e.groupe===gid)e.groupe=null;});
+  gabState.groupes=gabState.groupes.filter(g=>g.id!==gid);
+  gabRenderCanvas(); gabRenderCalques();
+}
+function gabActionMasse(action){
+  const ids=[...(gabState.multiSel||[])]; if(!ids.length)return;
+  if(action==='dupliquer'){
+    const nouveaux=[];
+    ids.forEach(id=>{
+      const el=gabState.elements.find(e=>e.id===id); if(!el)return;
+      const copie=JSON.parse(JSON.stringify(el)); copie.id='el'+(++GAB_SEQ); copie.nom=el.nom+' (copie)';
+      copie.x=Math.min(100-copie.w,el.x+4); copie.y=Math.min(100-copie.h,el.y+4); copie.groupe=null;
+      gabState.elements.push(copie); nouveaux.push(copie.id);
+    });
+    gabState.multiSel=nouveaux;
+  } else if(action==='supprimer'){
+    gabState.elements=gabState.elements.filter(e=>!ids.includes(e.id)); gabState.multiSel=[]; gabState.selected=null;
+  } else if(action==='masquer'){ ids.forEach(id=>{const el=gabState.elements.find(e=>e.id===id); if(el)el.visible=false;}); }
+  else if(action==='afficher'){ ids.forEach(id=>{const el=gabState.elements.find(e=>e.id===id); if(el)el.visible=true;}); }
+  else if(action==='verrouiller'){ ids.forEach(id=>{const el=gabState.elements.find(e=>e.id===id); if(el)el.verrou=true;}); }
+  else if(action==='deverrouiller'){ ids.forEach(id=>{const el=gabState.elements.find(e=>e.id===id); if(el)el.verrou=false;}); }
+  else if(action==='front'||action==='back'){
+    const arr=gabState.elements, selEls=ids.map(id=>arr.find(e=>e.id===id)).filter(Boolean);
+    const rest=arr.filter(e=>!ids.includes(e.id));
+    gabState.elements = action==='front' ? [...rest,...selEls] : [...selEls,...rest];
+  }
+  gabRenderCanvas(); gabRenderCalques(); gabRenderProps();
+}
+function gabAligner(mode){
+  const ids=gabState.multiSel||[]; if(ids.length<2)return;
+  const els=ids.map(id=>gabState.elements.find(e=>e.id===id)).filter(Boolean);
+  if(mode==='left'){ const v=Math.min(...els.map(e=>e.x)); els.forEach(e=>e.x=v); }
+  else if(mode==='right'){ const v=Math.max(...els.map(e=>e.x+e.w)); els.forEach(e=>e.x=v-e.w); }
+  else if(mode==='top'){ const v=Math.min(...els.map(e=>e.y)); els.forEach(e=>e.y=v); }
+  else if(mode==='bottom'){ const v=Math.max(...els.map(e=>e.y+e.h)); els.forEach(e=>e.y=v-e.h); }
+  else if(mode==='center-h'){ const mn=Math.min(...els.map(e=>e.x)),mx=Math.max(...els.map(e=>e.x+e.w)),c=(mn+mx)/2; els.forEach(e=>e.x=c-e.w/2); }
+  else if(mode==='center-v'){ const mn=Math.min(...els.map(e=>e.y)),mx=Math.max(...els.map(e=>e.y+e.h)),c=(mn+mx)/2; els.forEach(e=>e.y=c-e.h/2); }
+  else if(mode==='dist-h'){
+    const tries=[...els].sort((a,b)=>a.x-b.x); const mn=tries[0].x, mx=tries[tries.length-1].x+tries[tries.length-1].w;
+    const totalW=tries.reduce((s,e)=>s+e.w,0); const gap=(mx-mn-totalW)/(tries.length-1);
+    let curseur=mn; tries.forEach(e=>{e.x=curseur; curseur+=e.w+gap;});
+  }
+  gabRenderCanvas();
+}
 function gabValeurAffichee(el){
   if(el.champ==='libre')return el.texte||'';
   if(el.champ==='photo')return '';
@@ -1144,7 +1256,7 @@ function gabRenderCanvas(){
   host.style.backgroundImage=gabState.fond?'url('+gabState.fond+')':'none';
   host.innerHTML='';
   gabState.elements.forEach(el=>{
-    const d=document.createElement('div'); d.className='gab-el'+(el.id===gabState.selected?' sel':'');
+    const d=document.createElement('div'); d.className='gab-el'+(el.id===gabState.selected?' sel':'')+(el.visible===false?' gab-masque':'')+(el.verrou?' gab-verrou':'');
     d.style.left=el.x+'%'; d.style.top=el.y+'%'; d.style.width=el.w+'%'; d.style.height=el.h+'%';
     if(el.type==='rect'){
       d.style.background=el.couleur; d.style.opacity=el.opacite; d.style.borderRadius=(el.radius||0)+'px';
@@ -1170,15 +1282,31 @@ function gabRenderCanvas(){
     }
     d.dataset.id=el.id;
     d.addEventListener('pointerdown',gabStartDrag);
-    const h=document.createElement('span'); h.className='gab-handle'; h.addEventListener('pointerdown',gabStartResize);
-    d.appendChild(h); host.appendChild(d);
+    if(!el.verrou){ const h=document.createElement('span'); h.className='gab-handle'; h.addEventListener('pointerdown',gabStartResize); d.appendChild(h); }
+    host.appendChild(d);
   });
 }
+function gabRenderPropsMulti(){
+  const host=document.getElementById('gab-props'), n=gabState.multiSel.length;
+  host.innerHTML='<h3>Sélection multiple</h3><div class="s">'+n+' calques sélectionnés (cases cochées dans les Calques).</div>'+
+    '<div class="row2" style="margin-top:8px"><button class="btn ghost" type="button" onclick="gabActionMasse(\'front\')">Premier plan</button><button class="btn ghost" type="button" onclick="gabActionMasse(\'back\')">Arrière-plan</button></div>'+
+    '<div class="row2" style="margin-top:8px"><button class="btn ghost" type="button" onclick="gabActionMasse(\'dupliquer\')">Dupliquer</button><button class="btn ghost" type="button" onclick="gabActionMasse(\'supprimer\')">Supprimer</button></div>'+
+    '<div class="row2" style="margin-top:8px"><button class="btn ghost" type="button" onclick="gabActionMasse(\'masquer\')">Masquer</button><button class="btn ghost" type="button" onclick="gabActionMasse(\'afficher\')">Afficher</button></div>'+
+    '<div class="row2" style="margin-top:8px"><button class="btn ghost" type="button" onclick="gabActionMasse(\'verrouiller\')">Verrouiller</button><button class="btn ghost" type="button" onclick="gabActionMasse(\'deverrouiller\')">Déverrouiller</button></div>'+
+    '<button class="btn rouge" style="margin-top:10px;width:100%" onclick="gabGrouperSelection()">Grouper</button>'+
+    '<label style="font-size:12px;font-weight:600;display:block;margin-top:14px">Alignement automatique</label>'+
+    '<div class="row2" style="margin-top:6px"><button class="btn ghost" type="button" onclick="gabAligner(\'left\')">◂ Gauche</button><button class="btn ghost" type="button" onclick="gabAligner(\'center-h\')">Centre H</button></div>'+
+    '<div class="row2" style="margin-top:6px"><button class="btn ghost" type="button" onclick="gabAligner(\'right\')">Droite ▸</button><button class="btn ghost" type="button" onclick="gabAligner(\'center-v\')">Centre V</button></div>'+
+    '<div class="row2" style="margin-top:6px"><button class="btn ghost" type="button" onclick="gabAligner(\'top\')">▴ Haut</button><button class="btn ghost" type="button" onclick="gabAligner(\'bottom\')">Bas ▾</button></div>'+
+    '<button class="btn ghost" style="margin-top:6px;width:100%" type="button" onclick="gabAligner(\'dist-h\')">Distribuer horizontalement</button>';
+}
 function gabRenderProps(){
+  if(gabState.multiSel&&gabState.multiSel.length>=2){ gabRenderPropsMulti(); return; }
   const host=document.getElementById('gab-props'), el=gabState.elements.find(e=>e.id===gabState.selected);
-  if(!el){ host.innerHTML='<h3>Propriétés</h3><div class="gab-props-empty">Sélectionnez un élément du gabarit, ou ajoutez-en un ci-contre.</div>'; return; }
+  if(!el){ host.innerHTML='<h3>Propriétés</h3><div class="gab-props-empty">Sélectionnez un élément du gabarit (ou plusieurs calques via les cases à cocher), ou ajoutez-en un ci-contre.</div>'; return; }
+  const champNom='<div class="field"><label>Nom du calque</label><input id="gp-nom" value="'+(el.nom||'').replace(/"/g,'&quot;')+'"></div>';
   if(el.type==='zone'){
-    host.innerHTML='<h3>Zone</h3>'+
+    host.innerHTML=champNom+'<h3>Zone</h3>'+
       '<div class="field"><label>Donnée liée</label><select id="gp-champ">'+
         Object.entries(GAB_CHAMP_LABEL).map(([k,l])=>'<option value="'+k+'"'+(el.champ===k?' selected':'')+'>'+l+'</option>').join('')+
       '</select></div>'+
@@ -1196,7 +1324,7 @@ function gabRenderProps(){
       ):'<div class="s">La zone affichera la photo envoyée par le magasin dans Personnaliser (ou un espace réservé si aucune photo).</div>');
   } else if(el.type==='prix'){
     const ALIGN_OPTS='<option value="left"'+(el.align==='left'?' selected':'')+'>Gauche</option><option value="center"'+(el.align==='center'?' selected':'')+'>Centre</option><option value="right"'+(el.align==='right'?' selected':'')+'>Droite</option>';
-    host.innerHTML='<h3>Zone prix</h3>'+
+    host.innerHTML=champNom+'<h3>Zone prix</h3>'+
       '<div class="row2">'+
         '<div class="field"><label>Prix (entier)</label><input id="gp-entier" value="'+(el.entier||'').replace(/"/g,'&quot;')+'"></div>'+
         '<div class="field"><label>Centimes</label><input id="gp-centimes" value="'+(el.centimes||'').replace(/"/g,'&quot;')+'"></div>'+
@@ -1216,7 +1344,7 @@ function gabRenderProps(){
       '</div>'+
       '<div class="checks"><label class="'+(el.gras?'on':'')+'"><input type="checkbox" id="gp-gras"'+(el.gras?' checked':'')+'> Gras</label></div>';
   } else {
-    host.innerHTML='<h3>'+(el.type==='rect'?'Rectangle':'Cercle')+'</h3>'+
+    host.innerHTML=champNom+'<h3>'+(el.type==='rect'?'Rectangle':'Cercle')+'</h3>'+
       '<div class="row2">'+
         '<div class="field"><label>Couleur</label><input id="gp-couleur" type="color" value="'+el.couleur+'" style="height:36px"></div>'+
         '<div class="field"><label>Opacité</label><input id="gp-opacite" type="range" min="10" max="100" value="'+Math.round(el.opacite*100)+'"></div>'+
@@ -1237,6 +1365,7 @@ function gabRenderProps(){
     '</div>'+
     '<button class="btn ghost" style="margin-top:10px;width:100%" onclick="gabSupprimerSelection()">Supprimer cet élément</button>';
   const bind=(elId,evt,fn)=>{const n=document.getElementById(elId); if(n)n.addEventListener(evt,fn);};
+  bind('gp-nom','input',e=>{el.nom=e.target.value; gabRenderCalques();});
   bind('gp-champ','change',e=>{el.champ=e.target.value; if(el.champ==='libre'&&!el.texte)el.texte='Votre texte'; gabRenderCanvas(); gabRenderProps();});
   bind('gp-texte','input',e=>{el.texte=e.target.value; gabRenderCanvas();});
   bind('gp-police','change',e=>{el.police=e.target.value; gabRenderCanvas();});
@@ -1259,25 +1388,114 @@ function gabStartDrag(e){
   if(e.target.classList.contains('gab-handle'))return;
   e.preventDefault(); e.stopPropagation();
   const id=e.currentTarget.dataset.id; gabSelectionner(id);
-  const el=gabState.elements.find(x=>x.id===id), rect=document.getElementById('gab-canvas').getBoundingClientRect();
+  const el=gabState.elements.find(x=>x.id===id); if(!el||el.verrou)return;
+  const rect=document.getElementById('gab-canvas').getBoundingClientRect();
   gabDrag={id,mode:'move',startX:e.clientX,startY:e.clientY,origX:el.x,origY:el.y,rectW:rect.width,rectH:rect.height};
   window.addEventListener('pointermove',gabOnDrag); window.addEventListener('pointerup',gabEndDrag);
 }
 function gabStartResize(e){
   e.preventDefault(); e.stopPropagation();
   const id=e.currentTarget.parentElement.dataset.id; gabSelectionner(id);
-  const el=gabState.elements.find(x=>x.id===id), rect=document.getElementById('gab-canvas').getBoundingClientRect();
+  const el=gabState.elements.find(x=>x.id===id); if(!el||el.verrou)return;
+  const rect=document.getElementById('gab-canvas').getBoundingClientRect();
   gabDrag={id,mode:'resize',startX:e.clientX,startY:e.clientY,origW:el.w,origH:el.h,rectW:rect.width,rectH:rect.height};
   window.addEventListener('pointermove',gabOnDrag); window.addEventListener('pointerup',gabEndDrag);
 }
 function gabOnDrag(e){
   if(!gabDrag)return; const el=gabState.elements.find(x=>x.id===gabDrag.id); if(!el)return;
   const dxPct=(e.clientX-gabDrag.startX)/gabDrag.rectW*100, dyPct=(e.clientY-gabDrag.startY)/gabDrag.rectH*100;
-  if(gabDrag.mode==='move'){ el.x=Math.max(0,Math.min(100-el.w,gabDrag.origX+dxPct)); el.y=Math.max(0,Math.min(100-el.h,gabDrag.origY+dyPct)); }
+  if(gabDrag.mode==='move'){
+    const nx=Math.max(0,Math.min(100-el.w,gabDrag.origX+dxPct)), ny=Math.max(0,Math.min(100-el.h,gabDrag.origY+dyPct));
+    if(el.groupe){
+      const rdx=nx-el.x, rdy=ny-el.y;
+      gabState.elements.filter(m=>m.groupe===el.groupe).forEach(m=>{ m.x=Math.max(0,Math.min(100-m.w,m.x+rdx)); m.y=Math.max(0,Math.min(100-m.h,m.y+rdy)); });
+    } else { el.x=nx; el.y=ny; }
+  }
   else { el.w=Math.max(4,Math.min(100-el.x,gabDrag.origW+dxPct)); el.h=Math.max(4,Math.min(100-el.y,gabDrag.origH+dyPct)); }
   gabRenderCanvas();
 }
 function gabEndDrag(){ gabDrag=null; window.removeEventListener('pointermove',gabOnDrag); window.removeEventListener('pointerup',gabEndDrag); }
+// ---------- panneau gauche : calques et bibliotheque ----------
+function gabPanneauGauche(onglet){
+  document.querySelectorAll('#gab-onglets-gauche button').forEach(b=>b.classList.toggle('active',b.dataset.gt===onglet));
+  document.getElementById('gab-panneau-calques').style.display=onglet==='calques'?'':'none';
+  document.getElementById('gab-panneau-biblio').style.display=onglet==='biblio'?'':'none';
+}
+function gabIconeType(type){ return {rect:'▭',cercle:'○',zone:'T',prix:'€'}[type]||'▭'; }
+function gabRenderCalques(){
+  const host=document.getElementById('gab-panneau-calques'); if(!host)return;
+  const rendu=[...gabState.elements].reverse(); const groupesVus=new Set();
+  let html='<div class="gab-calques-actions">'+
+      '<button class="btn ghost" type="button" onclick="gabAjouterElement(\'rect\')">+ Rectangle</button>'+
+      '<button class="btn ghost" type="button" onclick="gabAjouterElement(\'cercle\')">+ Cercle</button>'+
+      '<button class="btn ghost" type="button" onclick="gabAjouterElement(\'zone\')">+ Zone</button>'+
+      '<button class="btn ghost" type="button" onclick="gabAjouterElement(\'prix\')">+ Prix</button>'+
+    '</div><div class="gab-calques-liste">';
+  if(!rendu.length) html+='<div class="gab-props-empty" style="padding:10px 14px">Aucun calque. Ajoutez un élément ci-dessus ou depuis la bibliothèque.</div>';
+  rendu.forEach(el=>{
+    if(el.groupe && !groupesVus.has(el.groupe)){
+      groupesVus.add(el.groupe); const g=gabState.groupes.find(x=>x.id===el.groupe);
+      html+='<div class="gab-calque-groupe"><span>▤ '+(g?g.nom:'Groupe')+'</span><button class="btn ghost" type="button" onclick="gabDegrouper(\''+el.groupe+'\')" style="padding:2px 8px;font-size:11px">Dégrouper</button></div>';
+    }
+    const sel=el.id===gabState.selected, checked=(gabState.multiSel||[]).includes(el.id);
+    html+='<div class="gab-calque-ligne'+(sel?' sel':'')+(el.groupe?' groupe-membre':'')+'" data-id="'+el.id+'">'+
+      '<input type="checkbox" class="gab-calque-check" data-id="'+el.id+'"'+(checked?' checked':'')+'>'+
+      '<span class="gab-calque-ic">'+gabIconeType(el.type)+'</span>'+
+      '<span class="gab-calque-nom" data-id="'+el.id+'">'+(el.nom||el.type)+'</span>'+
+      '<button class="gab-calque-btn" type="button" data-act="oeil" data-id="'+el.id+'" title="Afficher/masquer">'+(el.visible===false?'🚫':'👁')+'</button>'+
+      '<button class="gab-calque-btn" type="button" data-act="cadenas" data-id="'+el.id+'" title="Verrouiller">'+(el.verrou?'🔒':'🔓')+'</button>'+
+      '<button class="gab-calque-btn" type="button" data-act="haut" data-id="'+el.id+'" title="Avancer">▲</button>'+
+      '<button class="gab-calque-btn" type="button" data-act="bas" data-id="'+el.id+'" title="Reculer">▼</button>'+
+    '</div>';
+  });
+  html+='</div>'; host.innerHTML=html;
+  host.querySelectorAll('.gab-calque-ligne').forEach(row=>{
+    row.addEventListener('click',e=>{
+      if(e.target.closest('.gab-calque-check')||e.target.closest('.gab-calque-btn')||e.target.closest('.gab-calque-nom'))return;
+      gabSelectionner(row.dataset.id);
+    });
+  });
+  host.querySelectorAll('.gab-calque-check').forEach(cb=>{
+    cb.addEventListener('change',e=>{
+      const id=e.target.dataset.id; gabState.multiSel=gabState.multiSel||[];
+      if(e.target.checked){ if(!gabState.multiSel.includes(id))gabState.multiSel.push(id); }
+      else { gabState.multiSel=gabState.multiSel.filter(x=>x!==id); }
+      gabRenderProps();
+    });
+  });
+  host.querySelectorAll('.gab-calque-nom').forEach(nomEl=>{
+    nomEl.addEventListener('dblclick',e=>{
+      const id=e.target.dataset.id, el=gabState.elements.find(x=>x.id===id); if(!el)return;
+      const input=document.createElement('input'); input.value=el.nom||''; input.className='gab-calque-rename';
+      e.target.replaceWith(input); input.focus(); input.select();
+      const valider=()=>{ el.nom=input.value.trim()||el.nom; gabRenderCalques(); gabRenderProps(); };
+      input.addEventListener('blur',valider);
+      input.addEventListener('keydown',ev=>{ if(ev.key==='Enter')valider(); if(ev.key==='Escape')gabRenderCalques(); });
+    });
+  });
+  host.querySelectorAll('.gab-calque-btn').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation(); const id=btn.dataset.id, act=btn.dataset.act, el=gabState.elements.find(x=>x.id===id); if(!el)return;
+      if(act==='oeil'){ el.visible=el.visible===false?true:false; }
+      else if(act==='cadenas'){ el.verrou=!el.verrou; }
+      else if(act==='haut'){ gabDeplacerZid(id,'up'); return; }
+      else if(act==='bas'){ gabDeplacerZid(id,'down'); return; }
+      gabRenderCanvas(); gabRenderCalques();
+    });
+  });
+}
+function gabRenderBiblio(){
+  const sel=document.getElementById('gab-biblio-ens'); if(!sel)return;
+  const ens=sel.value, ch=ENSEIGNE_CHARTE[ens];
+  const host=document.getElementById('gab-biblio-grille');
+  const items=[
+    {cle:'logo',swatch:'background:'+ch.couleur+';color:#fff;display:flex;align-items:center;justify-content:center;font-family:\'Barlow Condensed\';font-weight:700',apercu:ens.split(' ').map(m=>m[0]).join('').toUpperCase()},
+    {cle:'bandeau',swatch:'background:'+ch.couleur,apercu:''},
+    {cle:'prix',swatch:'background:#fff;border:2px solid '+ch.couleur+';color:'+ch.couleur+';display:flex;align-items:center;justify-content:center;font-weight:700',apercu:'19,90€'},
+    {cle:'cadre',swatch:'background:#fff;border:3px solid '+ch.couleur,apercu:''},
+  ];
+  host.innerHTML=items.map(it=>'<button class="gab-biblio-item" type="button" onclick="gabAjouterDepuisBiblio(\''+it.cle+'\')"><span class="gab-biblio-swatch" style="'+it.swatch+'">'+it.apercu+'</span><span>'+GAB_BIBLIO_LABEL[it.cle]+'</span></button>').join('');
+}
 function publierGabaritCustom(){
   if(!gabState.elements.length){ toast('Ajoutez au moins un élément avant de publier'); return; }
   const nom=document.getElementById('gab-nom').value.trim()||'Nouveau gabarit', fmt=document.getElementById('gab-fmt').value;
@@ -1288,7 +1506,7 @@ function publierGabaritCustom(){
   const l=document.getElementById('g-liste'); const d=document.createElement('div'); d.innerHTML='<span>'+nom+'</span><span>'+g.elements.length+' éléments · gabarit personnalisé</span>'; l.prepend(d);
   toast('Gabarit « '+nom+' » publié : disponible dans Personnaliser');
   document.getElementById('gab-nom').value=''; document.getElementById('gab-bg-input').value='';
-  gabState={fond:null,elements:[],selected:null}; gabRenderCanvas(); gabRenderProps();
+  gabState={fond:null,elements:[],selected:null,multiSel:[],groupes:[]}; gabRenderCanvas(); gabRenderProps(); gabRenderCalques();
 }
 
 // ---------- espace centrale : operations, utilisateurs, magasins ----------
@@ -1346,6 +1564,7 @@ function renderGabaritCustom(g){
   host.style.backgroundImage=g.fond?'url('+g.fond+')':'none';
   host.innerHTML='';
   g.elements.forEach(el=>{
+    if(el.visible===false)return;
     const d=document.createElement('div'); d.className='gab-render-el';
     d.style.left=el.x+'%'; d.style.top=el.y+'%'; d.style.width=el.w+'%'; d.style.height=el.h+'%';
     if(el.type==='rect'){
@@ -1434,6 +1653,7 @@ async function composerRenduCustom(g){
   if(g.fond){ const img=await chargerImage(g.fond); x.drawImage(img,0,0,c.width,c.height); }
   const scaleFont=GAB_CANVAS_PX[g.format]/GAB_REF_WIDTH[g.format];
   for(const el of g.elements){
+    if(el.visible===false)continue;
     const ex=el.x/100*c.width, ey=el.y/100*c.height, ew=el.w/100*c.width, eh=el.h/100*c.height;
     if(el.type==='rect'){
       const rad=(el.radius||0)*scaleFont;
@@ -1547,7 +1767,7 @@ function exporter(fmt){
   if(fmt==='xlsx'&&window.XLSX){ const ws=XLSX.utils.aoa_to_sheet([cols,...rows]); ws['!cols']=cols.map(c=>({wch:Math.max(12,c.length+2)})); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,PRESET==='transport'?'Plan de transport':'Extraction'); XLSX.writeFile(wb,nom+'.xlsx'); toast('Fichier Excel généré : '+nom+'.xlsx'); return; }
   const csv=[cols,...rows].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\n'); const b=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=nom+'.csv'; a.click(); toast('Fichier CSV généré : '+nom+'.csv'+(fmt==='xlsx'?' (Excel indisponible hors ligne)':''));
 }
-champsInit(); preset('repartition'); gabarit(); maj(); initReferentiels(); gabAppliquerFormat(); gabRenderCanvas(); gabRenderProps();
+champsInit(); preset('repartition'); gabarit(); maj(); initReferentiels(); gabAppliquerFormat(); gabRenderCanvas(); gabRenderProps(); gabRenderCalques(); gabRenderBiblio();
 function maj(){
   document.getElementById('p-promo').textContent=document.getElementById('f-promo').value;
   const acc=document.getElementById('f-acc'); if(acc){document.getElementById('p-acc').textContent=acc.value; document.getElementById('f-acc-c').textContent=acc.value.length+' / 40';}
