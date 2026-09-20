@@ -644,9 +644,41 @@ body.menu-open{overflow:hidden}
   <h1>Espace centrale - Administration</h1>
   <div class="sub">Vue siège : vous créez vous-mêmes les opérations, les fiches produits et les gabarits ; vous extrayez vos rapports sans retraitement.</div>
   <div class="onglets">
-    <button class="active" data-o="fiches" onclick="onglet('fiches')">Fiches produits</button>
+    <button class="active" data-o="ops" onclick="onglet('ops')">Opérations</button>
+    <button data-o="fiches" onclick="onglet('fiches')">Fiches produits</button>
+    <button data-o="boutiqueadmin" onclick="onglet('boutiqueadmin')">Boutique</button>
     <button data-o="gab" onclick="onglet('gab')">Gabarits d'impression locale</button>
+    <button data-o="users" onclick="onglet('users')">Utilisateurs</button>
+    <button data-o="magasins" onclick="onglet('magasins')">Magasins</button>
     <button data-o="extract" onclick="onglet('extract')">Extracteur de rapports</button>
+  </div>
+
+  <!-- --- Opérations --- -->
+  <div class="sous active" id="sous-ops">
+    <div class="admin-grid">
+      <div class="card form">
+        <h3>Nouvelle opération marketing</h3>
+        <div class="s">Nationale (pilotée par la centrale) ou locale (créée par un magasin). Apparaît aussitôt sur la frise et dans les listes « Opération » de l'application.</div>
+        <div class="field"><label>Nom de l'opération</label><input id="o-nom" placeholder="ex. Portes ouvertes printemps 2027"></div>
+        <div class="row2">
+          <div class="field"><label>Catégorie</label><select id="o-cat"><option>Conquête</option><option>Fidélité</option><option>Événementiel</option></select></div>
+          <div class="field"><label>Portée</label><select id="o-portee"><option value="nat">Nationale</option><option value="loc">Locale</option></select></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Fenêtre de commande</label><input id="o-fenetre" placeholder="ex. jusqu'au 30/06"></div>
+          <div class="field"><label>Période de l'opération</label><input id="o-periode" placeholder="ex. du 20/08 au 15/09"></div>
+        </div>
+        <div class="checks"><label><input type="checkbox" id="o-oblig"> Obligatoire (pacte coopératif)</label></div>
+        <button class="btn rouge" onclick="creerOperation()">Créer l'opération</button>
+        <div class="liste-admin" id="o-liste"><div><span>Rentrée des classes 2027</span><span>Conquête · nationale · obligatoire</span></div><div><span>Noël 2027</span><span>Conquête · nationale</span></div><div><span>La Carte AH 2027</span><span>Fidélité · nationale</span></div></div>
+      </div>
+      <div class="card form">
+        <h3>Ce que voit le magasin</h3>
+        <div class="s">L'opération apparaît immédiatement sur la frise du tableau de bord et dans les listes « Opération » (fiches produits, extracteur). Une fois une fiche produit rattachée, elle devient commandable dans l'écran Commander.</div>
+        <div class="lockinfo">🔒 Le nom, la catégorie et le caractère obligatoire sont définis par la centrale et non modifiables par le magasin.</div>
+        <button class="btn ghost" style="margin-top:14px" onclick="go('dash')">Ouvrir le tableau de bord du magasin</button>
+      </div>
+    </div>
   </div>
 
   <!-- --- Fiches produits --- -->
@@ -670,6 +702,18 @@ body.menu-open{overflow:hidden}
         <div class="liste-admin" id="a1-liste"></div>
       </div>
       <div class="card form">
+        <h3>Ce que voit le magasin</h3>
+        <div class="s">Le support apparaît dans l'écran Commander du magasin, rattaché à l'opération choisie et pendant sa fenêtre de commande.</div>
+        <div class="lockinfo">🔒 Si un support est marqué obligatoire, le magasin ne peut pas le retirer de sa commande - la centrale l'attribue automatiquement en fin de fenêtre.</div>
+        <button class="btn ghost" style="margin-top:14px" onclick="go('cmd')">Ouvrir l'écran Commander du magasin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- --- Boutique (objets publicitaires) --- -->
+  <div class="sous" id="sous-boutiqueadmin">
+    <div class="admin-grid">
+      <div class="card form">
         <h3>Nouvel objet publicitaire</h3>
         <div class="s">Ajouté immédiatement à la boutique des magasins.</div>
         <div class="field"><label>Nom</label><input id="a2-nom" placeholder="ex. Casquette brodée Sport 2000"></div>
@@ -688,6 +732,12 @@ body.menu-open{overflow:hidden}
         <div class="checks"><label><input type="checkbox" id="a2-rep"> Repiquage possible</label></div>
         <button class="btn rouge" onclick="creerObjet()">Créer l'objet publicitaire</button>
         <div class="liste-admin" id="a2-liste"></div>
+      </div>
+      <div class="card form">
+        <h3>Ce que voit le magasin</h3>
+        <div class="s">L'objet publicitaire apparaît immédiatement dans la boutique, avec son circuit (entrepôt ou fournisseur) et son conditionnement.</div>
+        <div class="lockinfo">🔒 Le seuil d'alerte stock déclenche une notification au service marketing lorsque le stock de l'entrepôt central passe sous ce seuil.</div>
+        <button class="btn ghost" style="margin-top:14px" onclick="go('boutique')">Ouvrir la boutique du magasin</button>
       </div>
     </div>
   </div>
@@ -726,6 +776,65 @@ body.menu-open{overflow:hidden}
         <div class="lockinfo">🔒 Les zones non cochées restent figées : visuel de campagne, marque, mécanique de l'offre, typographies. Le magasin ne peut ni les déplacer ni les modifier.</div>
         <div class="lockinfo" style="margin-top:8px">✓ Aucune intervention de Manica Labs : la publication d'un gabarit est immédiate. L'accompagnement proposé en année 1 porte uniquement sur la reprise de vos ~200 gabarits existants, à votre rythme.</div>
         <button class="btn ghost" style="margin-top:14px" onclick="go('perso')">Ouvrir l'écran Personnaliser du magasin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- --- Utilisateurs --- -->
+  <div class="sous" id="sous-users">
+    <div class="admin-grid">
+      <div class="card form">
+        <h3>Nouvel utilisateur</h3>
+        <div class="s">Accès à la plateforme pour un magasin, la centrale ou un intervenant externe.</div>
+        <div class="field"><label>Nom</label><input id="u-nom" placeholder="ex. Julie Marchand"></div>
+        <div class="field"><label>E-mail</label><input id="u-email" type="email" placeholder="prenom.nom@sport2000.fr"></div>
+        <div class="row2">
+          <div class="field"><label>Rôle</label><select id="u-role"><option>Magasin adhérent</option><option>Centrale</option><option>Agence externe</option></select></div>
+          <div class="field"><label>Magasin de rattachement</label><select id="u-magasin"><option value="">- Aucun (centrale/agence) -</option></select></div>
+        </div>
+        <div class="checks"><label class="on"><input type="checkbox" id="u-actif" checked> Compte actif</label></div>
+        <button class="btn rouge" onclick="creerUtilisateur()">Créer l'utilisateur</button>
+        <div class="liste-admin" id="u-liste">
+          <div><span>Grenoble Échirolles (GE)</span><span>Magasin adhérent · actif</span></div>
+          <div><span>Mélanie Mary</span><span>Centrale · actif</span></div>
+          <div><span>Maria Silvestre Dias</span><span>Centrale · actif</span></div>
+          <div><span>Studio Just Happiness</span><span>Agence externe · lien sécurisé</span></div>
+        </div>
+      </div>
+      <div class="card form">
+        <h3>Rôles &amp; accès</h3>
+        <div class="s">Trois niveaux d'accès dans ce prototype :</div>
+        <div class="lockinfo">🏬 <b>Magasin adhérent</b> : commande ses supports, personnalise ses gabarits, suit ses projets.</div>
+        <div class="lockinfo" style="margin-top:8px">⚙ <b>Centrale</b> : espace administration complet (fiches produits, gabarits, opérations, extracteur, validation des BAT).</div>
+        <div class="lockinfo" style="margin-top:8px">🔗 <b>Agence externe</b> : accès par lien sécurisé, limité à l'espace projet concerné, sans compte à créer.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- --- Magasins --- -->
+  <div class="sous" id="sous-magasins">
+    <div class="admin-grid">
+      <div class="card form">
+        <h3>Nouveau magasin adhérent</h3>
+        <div class="s">Ajouté au référentiel des magasins de la coopérative.</div>
+        <div class="field"><label>Nom du magasin</label><input id="m-nom" placeholder="ex. Grenoble Échirolles"></div>
+        <div class="row2">
+          <div class="field"><label>Enseigne</label><select id="m-ens"><option>Sport 2000</option><option>Sport 2000 Montagne</option><option>Mondovelo</option><option>S2 Sneakers</option></select></div>
+          <div class="field"><label>Code magasin</label><input id="m-code" placeholder="ex. S2K1048"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Ville</label><input id="m-ville" placeholder="ex. Échirolles"></div>
+          <div class="field"><label>Département</label><input id="m-dept" placeholder="ex. Isère"></div>
+        </div>
+        <div class="field"><label>Contact réception livraisons</label><input id="m-contact" placeholder="ex. M. Rey - 8h-12h / 14h-18h"></div>
+        <button class="btn rouge" onclick="creerMagasin()">Créer le magasin</button>
+        <div class="liste-admin" id="m-liste"></div>
+      </div>
+      <div class="card form">
+        <h3>Référentiel magasins</h3>
+        <div class="s">Cible du marché : 740 magasins, 8 enseignes. Ce prototype illustre le principe sur 8 magasins de la région Rhône-Alpes.</div>
+        <div class="lockinfo">🔒 En version cible, l'import des magasins se ferait depuis le SI du groupement (pas de saisie manuelle en masse).</div>
+        <button class="btn ghost" style="margin-top:14px" onclick="onglet('extract')">Ouvrir l'extracteur de rapports</button>
       </div>
     </div>
   </div>
@@ -971,6 +1080,40 @@ function creerGabarit(){
   toast('Gabarit « '+nom+' » publié : visible par les magasins'); document.getElementById('g-nom').value='';
 }
 
+// ---------- espace centrale : operations, utilisateurs, magasins ----------
+function creerOperation(){
+  const nom=document.getElementById('o-nom').value.trim()||'Nouvelle opération'; const cat=document.getElementById('o-cat').value, portee=document.getElementById('o-portee').value==='nat'?'nationale':'locale';
+  const oblig=document.getElementById('o-oblig').checked, fen=document.getElementById('o-fenetre').value.trim(), per=document.getElementById('o-periode').value.trim();
+  const l=document.getElementById('o-liste'); const d=document.createElement('div'); d.innerHTML='<span>'+nom+(oblig?' <span class="chip warn" style="font-size:9.5px">obligatoire</span>':'')+'</span><span>'+cat+' · '+portee+(fen?' · '+fen:'')+(per?' · '+per:'')+'</span>'; l.prepend(d);
+  [document.getElementById('a1-op'),document.getElementById('x-op')].forEach(sel=>{if(!sel)return; const o=document.createElement('option'); o.text=nom; sel.add(o);});
+  toast('Opération « '+nom+' » créée : visible sur la frise et dans les listes « Opération »');
+  document.getElementById('o-nom').value=''; document.getElementById('o-fenetre').value=''; document.getElementById('o-periode').value='';
+}
+function creerUtilisateur(){
+  const nom=document.getElementById('u-nom').value.trim()||'Nouvel utilisateur'; const email=document.getElementById('u-email').value.trim();
+  const role=document.getElementById('u-role').value, mag=document.getElementById('u-magasin'); const magNom=mag.value?mag.options[mag.selectedIndex].text:'';
+  const actif=document.getElementById('u-actif').checked;
+  const l=document.getElementById('u-liste'); const d=document.createElement('div'); d.innerHTML='<span>'+nom+'</span><span>'+role+(magNom?' · '+magNom:'')+' · '+(actif?'actif':'inactif')+'</span>'; l.prepend(d);
+  toast('Utilisateur « '+nom+' » créé'+(email?' ('+email+')':''));
+  document.getElementById('u-nom').value=''; document.getElementById('u-email').value='';
+}
+function creerMagasin(){
+  const nom=document.getElementById('m-nom').value.trim()||'Nouveau magasin'; const ens=document.getElementById('m-ens').value;
+  const code=document.getElementById('m-code').value.trim()||'S2K'+Math.floor(1000+Math.random()*8999);
+  const ville=document.getElementById('m-ville').value.trim(), dept=document.getElementById('m-dept').value.trim(), contact=document.getElementById('m-contact').value.trim();
+  const l=document.getElementById('m-liste'); const d=document.createElement('div'); d.innerHTML='<span>'+nom+'</span><span>'+ens+' · '+code+(ville?' · '+ville:'')+(dept?' ('+dept+')':'')+'</span>'; l.prepend(d);
+  const sel=document.getElementById('u-magasin'); if(sel){const o=document.createElement('option'); o.text=nom+' ('+code+')'; sel.add(o);}
+  toast('Magasin « '+nom+' » ajouté au référentiel'+(contact?' - contact : '+contact:''));
+  document.getElementById('m-nom').value=''; document.getElementById('m-code').value=''; document.getElementById('m-ville').value=''; document.getElementById('m-dept').value=''; document.getElementById('m-contact').value='';
+}
+function initReferentiels(){
+  const selU=document.getElementById('u-magasin'), listeM=document.getElementById('m-liste');
+  MAGS.forEach((m,i)=>{
+    if(selU){const o=document.createElement('option'); o.text=m[0]+' (S2K'+(1040+i)+')'; selU.add(o);}
+    if(listeM){const d=document.createElement('div'); d.innerHTML='<span>'+m[0]+'</span><span>'+m[1]+' · S2K'+(1040+i)+' · '+m[4]+' ('+m[7]+')</span>'; listeM.appendChild(d);}
+  });
+}
+
 // ---------- personnalisation enrichie ----------
 const ZONES_DEF={a2:['remise','date','adresse','horaires','reseaux','photo','accroche'],a5:['remise','date','adresse','horaires','accroche'],vitro:['remise','date','horaires','accroche']};
 const CHAMP_ZONE={remise:'f-promo',date:'f-date',adresse:'f-adr',horaires:'f-hor',reseaux:'f-rs',photo:'f-photo',accroche:'f-acc'};
@@ -1068,7 +1211,7 @@ function exporter(fmt){
   if(fmt==='xlsx'&&window.XLSX){ const ws=XLSX.utils.aoa_to_sheet([cols,...rows]); ws['!cols']=cols.map(c=>({wch:Math.max(12,c.length+2)})); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,PRESET==='transport'?'Plan de transport':'Extraction'); XLSX.writeFile(wb,nom+'.xlsx'); toast('Fichier Excel généré : '+nom+'.xlsx'); return; }
   const csv=[cols,...rows].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\n'); const b=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=nom+'.csv'; a.click(); toast('Fichier CSV généré : '+nom+'.csv'+(fmt==='xlsx'?' (Excel indisponible hors ligne)':''));
 }
-champsInit(); preset('repartition'); gabarit(); maj();
+champsInit(); preset('repartition'); gabarit(); maj(); initReferentiels();
 function maj(){
   document.getElementById('p-promo').textContent=document.getElementById('f-promo').value;
   const acc=document.getElementById('f-acc'); if(acc){document.getElementById('p-acc').textContent=acc.value; document.getElementById('f-acc-c').textContent=acc.value.length+' / 40';}
