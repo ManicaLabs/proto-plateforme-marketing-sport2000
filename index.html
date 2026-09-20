@@ -12,6 +12,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <meta name="description" content="Prototype PWA de la plateforme collaborative marketing Sport 2000 - réponse AO Manica Labs">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -176,6 +177,46 @@ h1{font-family:'Barlow Condensed';font-weight:700;font-size:30px;letter-spacing:
 .part .pi span{font-size:11px;color:var(--gris)}
 .alert-planning{margin-top:14px;background:var(--ambre-pale);border:1px solid #F0DCA8;border-radius:8px;padding:10px 12px;font-size:12px;color:#7A5503;line-height:1.5}
 footer{border-top:1px solid var(--ligne);padding:14px;text-align:center;font-size:11px;color:var(--gris);background:#fff}
+/* ===== Adresses de livraison (commande) ===== */
+.adr{border:1px solid var(--ligne);border-radius:7px;padding:6px 8px;font-family:'Inter';font-size:11.5px;color:var(--encre);background:#fff;max-width:170px}
+.adr-note{font-size:11px;color:var(--gris);margin-top:4px}
+/* ===== Espace centrale (administration) ===== */
+.onglets{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 16px}
+.onglets button{border:1px solid var(--ligne);background:#fff;border-radius:99px;padding:7px 14px;font-size:12.5px;font-weight:600;color:var(--encre);cursor:pointer;font-family:'Inter'}
+.onglets button.active{background:var(--rouge);color:#fff;border-color:var(--rouge)}
+.sous{display:none}.sous.active{display:block}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.form h3{font-family:'Barlow Condensed';font-weight:700;font-size:17px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.form .s{font-size:12px;color:var(--gris);margin-bottom:12px}
+.form{padding:18px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.checks{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+.checks label{display:flex;align-items:center;gap:6px;font-size:12.5px;background:var(--fond);border:1px solid var(--ligne);border-radius:8px;padding:6px 10px;cursor:pointer}
+.checks label.on{border-color:var(--rouge);background:#FBE8EA}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--vert);color:#fff;padding:11px 18px;border-radius:99px;font-weight:600;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:95;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+.liste-admin{margin-top:12px;border-top:1px solid var(--ligne);padding-top:10px}
+.liste-admin div{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;padding:6px 0;border-bottom:1px dashed var(--ligne)}
+.liste-admin div span:last-child{color:var(--gris);font-size:11.5px;white-space:nowrap}
+/* extracteur */
+.presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.presets button{border:1px solid var(--ligne);background:#fff;border-radius:9px;padding:9px 12px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:'Inter';color:var(--encre);text-align:left}
+.presets button.active{border-color:var(--noir);background:var(--noir);color:#fff}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--ligne);border-radius:9px;margin-top:10px}
+table.tbl{border-collapse:collapse;width:100%;font-size:11.5px}
+table.tbl th{background:var(--noir);color:#fff;text-align:left;padding:8px 9px;font-weight:600;white-space:nowrap}
+table.tbl td{padding:7px 9px;border-bottom:1px solid var(--ligne);white-space:nowrap}
+table.tbl tr:nth-child(even) td{background:var(--fond)}
+.tbl-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;font-size:12.5px;color:var(--gris);flex-wrap:wrap}
+/* personnalisation enrichie */
+.affiche.a5{width:300px}
+.affiche.vitro{width:460px}
+.affiche.vitro .creat{padding:22px 26px}
+.affiche.vitro .creat h2{font-size:34px}
+.affiche .photo{height:110px;background:#EDEBE8 center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:#B9B6B1;font-size:11px;font-weight:600}
+.affiche .accroche{font-family:'Barlow Condensed';font-weight:700;font-size:20px;color:var(--rouge);margin-top:6px;text-transform:uppercase;letter-spacing:.02em}
+.compteur{font-size:11px;color:var(--gris);text-align:right;margin-top:-8px;margin-bottom:10px}
+@media(max-width:760px){.admin-grid{grid-template-columns:1fr}.row2{grid-template-columns:1fr}.affiche.vitro{width:100%}}
 /* ===== Boutique objets publicitaires ===== */
 .filtres{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
 .filtres button{border:1px solid var(--ligne);background:#fff;border-radius:99px;padding:6px 13px;font-size:12.5px;font-weight:600;color:var(--encre);cursor:pointer;font-family:'Inter'}
@@ -316,6 +357,7 @@ body.menu-open{overflow:hidden}
     <button data-s="boutique">Objets pub</button>
     <button data-s="perso">Personnaliser</button>
     <button data-s="projet">Suivi de projet</button>
+    <button data-s="admin">Centrale</button>
   </nav>
   <span class="mob-title" id="mob-title">Tableau de bord</span>
   <button id="btn-install" class="btn rouge" style="display:none;padding:7px 12px;font-size:12px;margin-right:12px">Installer l'application</button>
@@ -336,6 +378,7 @@ body.menu-open{overflow:hidden}
     <button data-s="boutique"><span class="ic">⬢</span><span class="tx"><b>Objets publicitaires</b><small>Boutique : étiquettes, tenues, oriflammes, sacs</small></span></button>
     <button data-s="perso"><span class="ic">✎</span><span class="tx"><b>Personnaliser</b><small>Supports locaux, prévisualisation, BAT</small></span></button>
     <button data-s="projet"><span class="ic">◷</span><span class="tx"><b>Suivi de projet</b><small>Jalons, relecture, intervenants</small></span></button>
+    <button data-s="admin"><span class="ic">⚙</span><span class="tx"><b>Espace centrale</b><small>Fiches produits, gabarits, extracteur de rapports</small></span></button>
   </nav>
   <div class="drawer-foot">
     <button id="btn-install-m" class="btn rouge" style="display:none">Installer l'application</button>
@@ -426,7 +469,7 @@ body.menu-open{overflow:hidden}
           <div class="ph">KIT PLV</div>
           <div class="inf"><b>Kit PLV obligatoire Rentrée 2027</b><span>Étiquettes repositionnables (3 lots de 50) · gongoles haute et basse · 2 bandeaux podium · notice</span></div>
           <div class="qty"><button onclick="q(this,-1)">−</button><input value="1" data-pu="90" onchange="tot()"><button onclick="q(this,1)">+</button></div>
-          <div class="prix" data-l>90,00 €</div>
+          <select class="adr" onchange="adrMaj()"><option value="p" selected>Adresse principale</option><option value="r">Réserve arrière (livraisons)</option><option value="g">Entrepôt groupement Isère</option></select><div class="prix" data-l>90,00 €</div>
         </div>
         <div class="oblig">⚠ Si ce kit n'est pas commandé, la centrale vous l'attribuera automatiquement.</div>
         <div style="height:12px"></div>
@@ -438,19 +481,19 @@ body.menu-open{overflow:hidden}
           <div class="ph">PLV<br>120×80</div>
           <div class="inf"><b>PLV 120 × 80 recto/verso</b><span>Lot de 5 ex. - allée centrale · aperçu et formats disponibles</span></div>
           <div class="qty"><button onclick="q(this,-1)">−</button><input value="2" data-pu="30" onchange="tot()"><button onclick="q(this,1)">+</button></div>
-          <div class="prix" data-l>60,00 €</div>
+          <select class="adr" onchange="adrMaj()"><option value="p">Adresse principale</option><option value="r" selected>Réserve arrière (livraisons)</option><option value="g">Entrepôt groupement Isère</option></select><div class="prix" data-l>60,00 €</div>
         </div>
         <div class="article">
           <div class="ph">AKYLUX</div>
           <div class="inf"><b>PLV parking (Akylux)</b><span>Lot de 2 panneaux 116 × 156 cm - livré avec colsons et clips</span></div>
           <div class="qty"><button onclick="q(this,-1)">−</button><input value="1" data-pu="25" onchange="tot()"><button onclick="q(this,1)">+</button></div>
-          <div class="prix" data-l>25,00 €</div>
+          <select class="adr" onchange="adrMaj()"><option value="p" selected>Adresse principale</option><option value="r">Réserve arrière (livraisons)</option><option value="g">Entrepôt groupement Isère</option></select><div class="prix" data-l>25,00 €</div>
         </div>
         <div class="article">
           <div class="ph">STICKER</div>
           <div class="inf"><b>Sticker vitrophanie</b><span>L50 × H100 cm - portes vitrées et vitrines · vendu à l'unité</span></div>
           <div class="qty"><button onclick="q(this,-1)">−</button><input value="0" data-pu="18" onchange="tot()"><button onclick="q(this,1)">+</button></div>
-          <div class="prix" data-l>0,00 €</div>
+          <select class="adr" onchange="adrMaj()"><option value="p" selected>Adresse principale</option><option value="r">Réserve arrière (livraisons)</option><option value="g">Entrepôt groupement Isère</option></select><div class="prix" data-l>0,00 €</div>
         </div>
       </div>
       <div style="height:14px"></div>
@@ -475,7 +518,8 @@ body.menu-open{overflow:hidden}
         <h3>Ma commande</h3>
         <div class="row"><span>Kit obligatoire</span><b id="r-kit">90,00 €</b></div>
         <div class="row"><span>PLV</span><b id="r-plv">85,00 €</b></div>
-        <div class="row"><span>Livraison</span><b>Adresse principale</b></div>
+        <div class="row"><span>Livraison</span><b id="r-adr">1 adresse</b></div>
+        <div class="adr-note" id="r-adr-detail">Adresse principale pour toutes les lignes. Chaque ligne peut être livrée à une adresse différente (réserve, entrepôt de groupement) : le plan de transport en tient compte.</div>
         <div class="total"><span>Total HT</span><span class="v" id="r-total">175,00 €</span></div>
         <div class="note">Affichage indicatif - facturation ou prise en charge (totale/partielle) par la centrale. Aucun paiement en ligne.</div>
         <button class="btn rouge" onclick="alert('Commande validée - confirmation envoyée par e-mail avec le détail et les CGV.')">Valider ma commande</button>
@@ -520,26 +564,29 @@ body.menu-open{overflow:hidden}
 <!-- ============ PERSONNALISATION ============ -->
 <section class="screen" id="perso">
   <h1>Personnaliser - Anniversaire 10 ans</h1>
-  <div class="sub">Opération locale · gabarit « Affiche événement A2 » · les éléments créatifs sont verrouillés, vous personnalisez uniquement les zones autorisées.</div>
+  <div class="sub">Opération locale · les éléments créatifs sont verrouillés, vous personnalisez uniquement les zones autorisées par la centrale.</div>
 
   <div class="perso-grid">
     <div class="card panneau">
       <h3>Mes informations</h3>
       <div class="s">La prévisualisation se met à jour en temps réel.</div>
+      <div class="field"><label>Gabarit (défini par la centrale)</label>
+        <select id="f-gab" onchange="gabarit()"><option value="a2">Affiche événement A2</option><option value="a5">Flyer promo A5</option><option value="vitro">Vitrophanie 100 × 50</option></select></div>
+      <div class="field"><label>Accroche locale <span style="color:var(--gris);font-weight:400">(40 caractères max)</span></label><input id="f-acc" maxlength="40" value="Cadeau offert aux 100 premiers clients" oninput="maj()"><div class="compteur" id="f-acc-c">38 / 40</div></div>
       <div class="field"><label>Pourcentage de remise</label>
         <select id="f-promo" oninput="maj()"><option>-20 %</option><option selected>-30 %</option><option>-40 %</option><option>-50 %</option></select></div>
       <div class="field"><label>Date de l'événement</label><input id="f-date" value="Samedi 18 septembre" oninput="maj()"></div>
       <div class="field"><label>Adresse du magasin</label><input id="f-adr" value="14 av. de Grugliasco, Échirolles" oninput="maj()"></div>
       <div class="field"><label>Horaires</label><input id="f-hor" value="9h30 – 19h30 non-stop" oninput="maj()"></div>
       <div class="field"><label>Réseaux sociaux</label><input id="f-rs" value="@sport2000echirolles" oninput="maj()"></div>
-      <div class="field"><label>Photographie locale (en-tête zone magasin)</label><input type="file" disabled title="Prototype"></div>
+      <div class="field"><label>Photographie locale (zone magasin)</label><input type="file" id="f-photo" accept="image/*" onchange="photo(this)"></div>
       <div class="lockinfo">🔒 Le visuel de campagne, la marque et la mécanique de l'offre sont définis par la centrale et ne sont pas modifiables.</div>
     </div>
 
     <div>
       <div class="apercu-wrap">
-        <div class="apercu-head"><span>PRÉVISUALISATION TEMPS RÉEL - fidèle à l'impression (PDF, fonds perdus, quadri)</span><span class="chip loc">Gabarit v2027-EVT-A2</span></div>
-        <div class="affiche">
+        <div class="apercu-head"><span>PRÉVISUALISATION TEMPS RÉEL - fidèle à l'impression (PDF, fonds perdus, quadri)</span><span class="chip loc" id="p-gab-tag">Gabarit v2027-EVT-A2</span></div>
+        <div class="affiche" id="affiche">
           <div class="creat">
             <div class="lock">🔒 Zone créative verrouillée</div>
             <div class="marque">SPORT 2000</div>
@@ -548,6 +595,8 @@ body.menu-open{overflow:hidden}
           </div>
           <div class="zone">
             <span class="tag">ZONE PERSONNALISABLE</span>
+            <div class="photo" id="p-photo">Votre photo de magasin</div>
+            <div class="accroche" id="p-acc">Cadeau offert aux 100 premiers clients</div>
             <b id="p-date">Samedi 18 septembre</b>
             <div class="l1" id="p-adr">14 av. de Grugliasco, Échirolles</div>
             <div class="l1" id="p-hor">9h30 – 19h30 non-stop</div>
@@ -555,7 +604,7 @@ body.menu-open{overflow:hidden}
           </div>
         </div>
         <div class="perso-actions">
-          <button class="btn ghost">Télécharger l'aperçu PDF</button>
+          <button class="btn ghost" onclick="exportBAT()">Télécharger le fichier prêt à imprimer</button>
           <button class="btn rouge" onclick="bat()">Envoyer en validation (BAT centrale)</button>
         </div>
         <div class="statut-bat" id="statut-bat">⏳ Statut : brouillon - la centrale valide chaque BAT avant l'envoi en impression.</div>
@@ -563,6 +612,122 @@ body.menu-open{overflow:hidden}
     </div>
   </div>
 </section>
+
+<!-- ============ ESPACE CENTRALE ============ -->
+<section class="screen" id="admin">
+  <h1>Espace centrale - Administration</h1>
+  <div class="sub">Vue siège : vous créez vous-mêmes les opérations, les fiches produits et les gabarits ; vous extrayez vos rapports sans retraitement.</div>
+  <div class="onglets">
+    <button class="active" data-o="fiches" onclick="onglet('fiches')">Fiches produits</button>
+    <button data-o="gab" onclick="onglet('gab')">Gabarits d'impression locale</button>
+    <button data-o="extract" onclick="onglet('extract')">Extracteur de rapports</button>
+  </div>
+
+  <!-- --- Fiches produits --- -->
+  <div class="sous active" id="sous-fiches">
+    <div class="admin-grid">
+      <div class="card form">
+        <h3>Nouveau support d'opération nationale</h3>
+        <div class="s">Rattaché à une opération, commandable pendant sa fenêtre.</div>
+        <div class="field"><label>Opération</label><select id="a1-op"><option>Rentrée des classes 2027</option><option>Noël 2027</option><option>La Carte AH 2027</option></select></div>
+        <div class="field"><label>Nom du support</label><input id="a1-nom" placeholder="ex. Kakémono 85 × 200"></div>
+        <div class="row2">
+          <div class="field"><label>Type</label><select id="a1-type"><option>PLV</option><option>Dépliant</option><option>Affichage</option><option>Digital (téléchargeable)</option></select></div>
+          <div class="field"><label>Prix unitaire HT</label><input id="a1-prix" type="number" value="35" step="0.5"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Quantité minimale</label><input id="a1-min" type="number" value="0"></div>
+          <div class="field"><label>Prise en charge centrale</label><select id="a1-pec"><option>Aucune</option><option>Partielle</option><option>Totale</option></select></div>
+        </div>
+        <div class="checks"><label><input type="checkbox" id="a1-oblig"> Obligatoire (pacte coopératif, attribution automatique)</label></div>
+        <button class="btn rouge" onclick="creerSupport()">Créer le support</button>
+        <div class="liste-admin" id="a1-liste"></div>
+      </div>
+      <div class="card form">
+        <h3>Nouvel objet publicitaire</h3>
+        <div class="s">Ajouté immédiatement à la boutique des magasins.</div>
+        <div class="field"><label>Nom</label><input id="a2-nom" placeholder="ex. Casquette brodée Sport 2000"></div>
+        <div class="row2">
+          <div class="field"><label>Catégorie</label><select id="a2-cat"><option>Étiquetage</option><option>Tenues vendeurs</option><option>Oriflammes &amp; drapeaux</option><option>Sacs &amp; emballages</option></select></div>
+          <div class="field"><label>Circuit</label><select id="a2-circ"><option value="ent">Entrepôt central</option><option value="four">Direct fournisseur</option></select></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Conditionnement</label><input id="a2-cond" value="Par 10"></div>
+          <div class="field"><label>Prix unitaire HT</label><input id="a2-prix" type="number" value="9.5" step="0.1"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Seuil d'alerte stock</label><input id="a2-seuil" type="number" value="50"></div>
+          <div class="field"><label>Fournisseur</label><input id="a2-four" value="Textile Pro"></div>
+        </div>
+        <div class="checks"><label><input type="checkbox" id="a2-rep"> Repiquage possible</label></div>
+        <button class="btn rouge" onclick="creerObjet()">Créer l'objet publicitaire</button>
+        <div class="liste-admin" id="a2-liste"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- --- Gabarits --- -->
+  <div class="sous" id="sous-gab">
+    <div class="admin-grid">
+      <div class="card form">
+        <h3>Nouveau gabarit d'impression locale</h3>
+        <div class="s">Vous déposez la création de votre agence et vous décidez des zones que les magasins peuvent personnaliser. Tout le reste est verrouillé.</div>
+        <div class="field"><label>Nom du gabarit</label><input id="g-nom" placeholder="ex. Affiche Portes ouvertes A2"></div>
+        <div class="row2">
+          <div class="field"><label>Format</label><select id="g-fmt"><option value="a2">A2 portrait</option><option value="a5">A5 portrait</option><option value="vitro">Vitrophanie 100 × 50</option></select></div>
+          <div class="field"><label>Fichier de création (agence)</label><input type="file" accept=".pdf,.ai,.indd,image/*"></div>
+        </div>
+        <label style="font-size:12px;font-weight:600">Zones ouvertes à la personnalisation</label>
+        <div class="checks" id="g-zones">
+          <label class="on"><input type="checkbox" checked value="remise"> Pourcentage de remise</label>
+          <label class="on"><input type="checkbox" checked value="date"> Date</label>
+          <label class="on"><input type="checkbox" checked value="adresse"> Adresse</label>
+          <label class="on"><input type="checkbox" checked value="horaires"> Horaires</label>
+          <label><input type="checkbox" value="reseaux"> Réseaux sociaux</label>
+          <label><input type="checkbox" value="photo"> Photo locale</label>
+          <label><input type="checkbox" value="accroche"> Accroche locale</label>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Police imposée</label><select><option>Barlow Condensed (charte)</option><option>Inter (charte)</option></select></div>
+          <div class="field"><label>Validation</label><select><option>BAT validé par la centrale</option><option>Libre (sans validation)</option></select></div>
+        </div>
+        <button class="btn rouge" onclick="creerGabarit()">Publier le gabarit</button>
+        <div class="liste-admin" id="g-liste"><div><span>Affiche événement A2</span><span>7 zones · 12 magasins l'utilisent</span></div><div><span>Flyer promo A5</span><span>5 zones · 4 magasins</span></div><div><span>Vitrophanie 100 × 50</span><span>4 zones · 2 magasins</span></div></div>
+      </div>
+      <div class="card form">
+        <h3>Ce que voit le magasin</h3>
+        <div class="s">Le gabarit publié apparaît dans la liste de l'écran Personnaliser, avec uniquement les zones que vous avez ouvertes.</div>
+        <div class="lockinfo">🔒 Les zones non cochées restent figées : visuel de campagne, marque, mécanique de l'offre, typographies. Le magasin ne peut ni les déplacer ni les modifier.</div>
+        <div class="lockinfo" style="margin-top:8px">✓ Aucune intervention de Manica Labs : la publication d'un gabarit est immédiate. L'accompagnement proposé en année 1 porte uniquement sur la reprise de vos ~200 gabarits existants, à votre rythme.</div>
+        <button class="btn ghost" style="margin-top:14px" onclick="go('perso')">Ouvrir l'écran Personnaliser du magasin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- --- Extracteur --- -->
+  <div class="sous" id="sous-extract">
+    <div class="card form">
+      <h3>Extracteur de rapports</h3>
+      <div class="s">Choisissez un modèle ou composez votre extraction : une colonne par élément, prête pour vos imprimeurs, vos transporteurs et votre suivi.</div>
+      <div class="presets">
+        <button class="active" data-p="repartition" onclick="preset('repartition')">Répartition PLV par magasin</button>
+        <button data-p="transport" onclick="preset('transport')">Plan de transport (par adresse de livraison)</button>
+        <button data-p="commandes" onclick="preset('commandes')">Extraction commandes par opération</button>
+        <button data-p="libre" onclick="preset('libre')">Composer librement</button>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Opération</label><select id="x-op" onchange="requete()"><option value="">Toutes</option><option>Rentrée des classes 2027</option><option>Beaux jours 2027</option><option>La Carte AH 2027</option></select></div>
+        <div class="field"><label>Enseigne</label><select id="x-ens" onchange="requete()"><option value="">Toutes</option><option>Sport 2000</option><option>Sport 2000 Montagne</option><option>Mondovelo</option><option>S2 Sneakers</option></select></div>
+      </div>
+      <label style="font-size:12px;font-weight:600">Champs à extraire</label>
+      <div class="checks" id="x-champs"></div>
+      <div class="tbl-wrap"><table class="tbl" id="x-table"></table></div>
+      <div class="tbl-foot"><span id="x-count"></span><div style="display:flex;gap:8px"><button class="btn ghost" onclick="exporter('csv')">Exporter CSV</button><button class="btn rouge" onclick="exporter('xlsx')">Exporter Excel</button></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
 
 <!-- ============ PROJET ============ -->
 <section class="screen" id="projet">
@@ -639,12 +804,13 @@ body.menu-open{overflow:hidden}
   <button data-s="boutique"><span class="ic">⬢</span><span class="tx">Objets pub</span></button>
   <button data-s="perso"><span class="ic">✎</span><span class="tx">Personnaliser</span></button>
   <button data-s="projet"><span class="ic">◷</span><span class="tx">Projets</span></button>
+  <button data-s="admin"><span class="ic">⚙</span><span class="tx">Centrale</span></button>
 </nav>
 
 <footer>Prototype PWA - Plateforme collaborative marketing Sport 2000 · Réponse AO 2026 · Écrans non contractuels<br>Application installable sur smartphone et tablette · notifications push · consultation et commande en mobilité</footer>
 
 <script>
-const TITRES={dash:'Tableau de bord',cmd:'Commander',boutique:'Objets publicitaires',perso:'Personnaliser',projet:'Suivi de projet'};
+const TITRES={dash:'Tableau de bord',cmd:'Commander',boutique:'Objets publicitaires',perso:'Personnaliser',projet:'Suivi de projet',admin:'Espace centrale'};
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -692,8 +858,134 @@ function totB(){
   document.getElementById('b-franco-txt').textContent= four>=F ? 'Franco fournisseur atteint : port offert ✓' : ('Franco fournisseur : il manque '+eur(F-four)+' pour le port offert');
 }
 totB();
+// ---------- adresses de livraison ----------
+const ADR={p:'Adresse principale',r:'Réserve arrière',g:'Entrepôt groupement Isère'};
+function adrMaj(){
+  const sels=[...document.querySelectorAll('#cmd select.adr')].filter(s=>parseInt(s.parentElement.querySelector('input[data-pu]')?.value||0)>0 || true);
+  const set=new Set(sels.map(s=>s.value));
+  document.getElementById('r-adr').textContent=set.size+' adresse'+(set.size>1?'s':'');
+  document.getElementById('r-adr-detail').textContent=set.size>1
+    ? 'Livraison éclatée : '+[...set].map(k=>ADR[k]).join(' · ')+'. Le plan de transport transmis à l\'imprimeur en tient compte.'
+    : ADR[[...set][0]]+' pour toutes les lignes. Chaque ligne peut être livrée à une adresse différente (réserve, entrepôt de groupement) : le plan de transport en tient compte.';
+}
+adrMaj();
+
+// ---------- toast ----------
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2600);}
+
+// ---------- espace centrale : onglets ----------
+function onglet(id){document.querySelectorAll('#admin .onglets button').forEach(b=>b.classList.toggle('active',b.dataset.o===id));document.querySelectorAll('#admin .sous').forEach(d=>d.classList.toggle('active',d.id==='sous-'+id));}
+document.querySelectorAll('.checks label').forEach(l=>{const c=l.querySelector('input');if(c)c.addEventListener('change',()=>l.classList.toggle('on',c.checked));});
+
+// ---------- fiches produits ----------
+function creerSupport(){
+  const nom=document.getElementById('a1-nom').value.trim()||'Nouveau support';
+  const op=document.getElementById('a1-op').value, type=document.getElementById('a1-type').value, prix=parseFloat(document.getElementById('a1-prix').value||0);
+  const oblig=document.getElementById('a1-oblig').checked;
+  const l=document.getElementById('a1-liste'); const d=document.createElement('div'); d.innerHTML='<span>'+nom+(oblig?' <span class="chip warn" style="font-size:9.5px">obligatoire</span>':'')+'</span><span>'+op+' · '+type+' · '+prix.toFixed(2).replace('.',',')+' €</span>'; l.prepend(d);
+  // apparait dans l'ecran Commander
+  const card=document.querySelectorAll('#cmd .card')[1]; const a=document.createElement('div'); a.className='article';
+  a.innerHTML='<div class="ph">'+type.toUpperCase().slice(0,7)+'</div><div class="inf"><b>'+nom+'</b><span>Créé par la centrale · '+op+(oblig?' · obligatoire':'')+'</span></div><div class="qty"><button onclick="q(this,-1)">−</button><input value="'+(oblig?1:0)+'" data-pu="'+prix+'" onchange="tot()"><button onclick="q(this,1)">+</button></div>'+'<select class="adr" onchange="adrMaj()"><option value="p">Adresse principale</option><option value="r">Réserve arrière (livraisons)</option><option value="g">Entrepôt groupement Isère</option></select><div class="prix" data-l>0,00 €</div>';
+  card.appendChild(a); tot(); toast('Support « '+nom+' » publié dans la commande des magasins');
+  document.getElementById('a1-nom').value='';
+}
+function creerObjet(){
+  const nom=document.getElementById('a2-nom').value.trim()||'Nouvel objet'; const cat=document.getElementById('a2-cat').value, circ=document.getElementById('a2-circ').value;
+  const cond=document.getElementById('a2-cond').value, prix=parseFloat(document.getElementById('a2-prix').value||0), rep=document.getElementById('a2-rep').checked;
+  const l=document.getElementById('a2-liste'); const d=document.createElement('div'); d.innerHTML='<span>'+nom+'</span><span>'+cat+' · '+(circ==='ent'?'entrepôt':'fournisseur')+' · '+prix.toFixed(2).replace('.',',')+' €</span>'; l.prepend(d);
+  const g=document.querySelector('#boutique .prod-grid'); const p=document.createElement('div'); p.className='card prod';
+  p.innerHTML='<div class="vis">'+cat.toUpperCase().slice(0,9)+'</div><b>'+nom+'</b><div class="meta"><span class="chip '+circ+'">'+(circ==='ent'?'Entrepôt central':'Direct fournisseur')+'</span><span class="chip gris">'+cond+'</span>'+(rep?'<span class="chip loc">Repiquage possible</span>':'')+'<span class="chip ok">Nouveau</span></div><div class="desc">Fiche créée par la centrale depuis l\'espace d\'administration.</div><div class="bas"><span class="pu"><b>'+prix.toFixed(2).replace('.',',')+' €</b> / unité</span><div class="qty"><button onclick="qb(this,-1)">−</button><input value="0" data-pu="'+prix+'" data-circ="'+circ+'" onchange="totB()"><button onclick="qb(this,1)">+</button></div></div>';
+  g.prepend(p); toast('Objet « '+nom+' » ajouté à la boutique'); document.getElementById('a2-nom').value='';
+}
+function creerGabarit(){
+  const nom=document.getElementById('g-nom').value.trim()||'Nouveau gabarit'; const fmt=document.getElementById('g-fmt').value;
+  const zones=[...document.querySelectorAll('#g-zones input:checked')].map(i=>i.value);
+  const l=document.getElementById('g-liste'); const d=document.createElement('div'); d.innerHTML='<span>'+nom+'</span><span>'+zones.length+' zones · publié à l\'instant</span>'; l.prepend(d);
+  const sel=document.getElementById('f-gab'); const o=document.createElement('option'); o.value=fmt; o.text=nom; o.dataset.zones=zones.join(','); sel.add(o); sel.value=nom; sel.selectedIndex=sel.options.length-1; gabarit();
+  toast('Gabarit « '+nom+' » publié : visible par les magasins'); document.getElementById('g-nom').value='';
+}
+
+// ---------- personnalisation enrichie ----------
+const ZONES_DEF={a2:['remise','date','adresse','horaires','reseaux','photo','accroche'],a5:['remise','date','adresse','horaires','accroche'],vitro:['remise','date','horaires','accroche']};
+const CHAMP_ZONE={remise:'f-promo',date:'f-date',adresse:'f-adr',horaires:'f-hor',reseaux:'f-rs',photo:'f-photo',accroche:'f-acc'};
+const PREV_ZONE={date:'p-date',adresse:'p-adr',horaires:'p-hor',reseaux:'p-rs',photo:'p-photo',accroche:'p-acc'};
+function gabarit(){
+  const sel=document.getElementById('f-gab'); const opt=sel.options[sel.selectedIndex]; const fmt=opt.value;
+  const zones=opt.dataset.zones?opt.dataset.zones.split(','):ZONES_DEF[fmt]||ZONES_DEF.a2;
+  const aff=document.getElementById('affiche'); aff.className='affiche'+(fmt==='a5'?' a5':fmt==='vitro'?' vitro':'');
+  document.getElementById('p-gab-tag').textContent='Gabarit · '+opt.text;
+  Object.entries(CHAMP_ZONE).forEach(([z,id])=>{const el=document.getElementById(id); if(el&&el.closest('.field')) el.closest('.field').style.display=zones.includes(z)?'':'none';});
+  Object.entries(PREV_ZONE).forEach(([z,id])=>{const el=document.getElementById(id); if(el) el.style.display=zones.includes(z)?'':'none';});
+  document.getElementById('p-promo').style.display=zones.includes('remise')?'':'none';
+}
+function photo(inp){const f=inp.files&&inp.files[0]; if(!f)return; const r=new FileReader(); r.onload=e=>{const p=document.getElementById('p-photo'); p.style.backgroundImage='url('+e.target.result+')'; p.textContent='';}; r.readAsDataURL(f);}
+function exportBAT(){
+  const c=document.createElement('canvas'); const fmt=document.getElementById('affiche').classList.contains('vitro')?'vitro':document.getElementById('affiche').classList.contains('a5')?'a5':'a2';
+  c.width=fmt==='vitro'?1400:1000; c.height=fmt==='vitro'?700:1414; const x=c.getContext('2d'); const B=40; // fonds perdus
+  x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height);
+  const hc=fmt==='vitro'?c.height*0.62:c.height*0.58;
+  x.fillStyle='#D8121F'; x.fillRect(0,0,c.width,hc); x.fillStyle='#17181C'; x.beginPath(); x.moveTo(c.width*0.55,0); x.lineTo(c.width,0); x.lineTo(c.width,hc); x.lineTo(c.width*0.35,hc); x.closePath(); x.fill();
+  x.fillStyle='#fff'; x.font='bold '+(c.width*0.028)+'px Arial'; x.fillText('SPORT 2000',B+30,B+60);
+  x.font='bold '+(c.width*0.085)+'px Arial'; x.fillText('10 ANS,',B+30,hc*0.42); x.fillText('ÇA SE FÊTE !',B+30,hc*0.42+c.width*0.09);
+  if(document.getElementById('p-promo').style.display!=='none'){x.fillStyle='#fff'; x.fillRect(B+30,hc*0.62,c.width*0.26,c.width*0.09); x.fillStyle='#D8121F'; x.font='bold '+(c.width*0.06)+'px Arial'; x.fillText(document.getElementById('p-promo').textContent,B+50,hc*0.62+c.width*0.068);}
+  let y=hc+70; x.fillStyle='#17181C';
+  const lignes=[['p-acc','bold '+(c.width*0.034)+'px Arial','#D8121F'],['p-date','bold '+(c.width*0.03)+'px Arial','#17181C'],['p-adr',(c.width*0.024)+'px Arial','#555'],['p-hor',(c.width*0.024)+'px Arial','#555'],['p-rs','bold '+(c.width*0.024)+'px Arial','#17181C']];
+  lignes.forEach(([id,font,col])=>{const el=document.getElementById(id); if(!el||el.style.display==='none')return; x.font=font; x.fillStyle=col; x.fillText(el.textContent,B+30,y); y+=c.width*0.05;});
+  // traits de coupe
+  x.strokeStyle='#000'; x.lineWidth=2; [[B,0,B,B-10],[0,B,B-10,B],[c.width-B,0,c.width-B,B-10],[c.width,B,c.width-B+10,B],[B,c.height,B,c.height-B+10],[0,c.height-B,B-10,c.height-B],[c.width-B,c.height,c.width-B,c.height-B+10],[c.width,c.height-B,c.width-B+10,c.height-B]].forEach(([a,b,d,e])=>{x.beginPath();x.moveTo(a,b);x.lineTo(d,e);x.stroke();});
+  x.fillStyle='#888'; x.font=(c.width*0.014)+'px Arial'; x.fillText('BAT généré par la plateforme · fonds perdus 5 mm · traits de coupe · quadri · '+new Date().toLocaleDateString('fr-FR'),B+30,c.height-B+28);
+  const a=document.createElement('a'); a.download='BAT_Anniversaire_10_ans_'+fmt.toUpperCase()+'.png'; a.href=c.toDataURL('image/png'); a.click();
+  toast('Fichier prêt à imprimer généré (fonds perdus, traits de coupe)');
+}
+
+// ---------- extracteur ----------
+const MAGS=[
+ ['Grenoble Échirolles','Sport 2000','14 av. de Grugliasco','38130','Échirolles','M. Rey','8h-12h / 14h-18h','Isère'],
+ ['Chambéry Bassens','Sport 2000 Montagne','ZAC des Landiers','73000','Chambéry','Mme Perrin','7h30-12h','Savoie'],
+ ['Annecy Seynod','Sport 2000','120 rte d\'Aix','74600','Seynod','M. Blanc','8h-12h','Haute-Savoie'],
+ ['Lyon Vénissieux','Mondovelo','rue Ampère','69200','Vénissieux','Mme Ilic','9h-13h','Rhône'],
+ ['Valence Guilherand','Sport 2000','av. de la République','07500','Guilherand-Granges','M. Saad','8h-11h30','Ardèche'],
+ ['Bourgoin-Jallieu','S2 Sneakers','ZI du Bion','38300','Bourgoin-Jallieu','Mme Costa','9h-12h / 14h-17h','Isère'],
+ ['Albertville','Sport 2000 Montagne','rue Pasteur','73200','Albertville','M. Fabre','8h-12h','Savoie'],
+ ['Voiron','Sport 2000','ZA Centr\'Alp','38500','Voiron','Mme Durand','8h30-12h','Isère'],
+];
+const ARTS=[['Kit PLV obligatoire','Kit PLV','Imprimerie Alpes Print','Carton de 1',1],['PLV 120 × 80 R/V','PLV','Imprimerie Alpes Print','Tube de 5',5],['PLV parking Akylux','PLV','Akylux Sud-Est','Lot de 2',2],['Dépliant 8 pages','Dépliant','Imprimerie Alpes Print','Carton de 250',250],['Sticker vitrophanie','Affichage','Adhésifs Rhône','Unité',1]];
+const OPS=['Rentrée des classes 2027','Beaux jours 2027','La Carte AH 2027'];
+const STAT=['Validée','Validée','Validée','En production','Expédiée','Brouillon'];
+let LIGNES=[]; (function(){let n=0; MAGS.forEach((m,mi)=>OPS.forEach((op,oi)=>ARTS.forEach((a,ai)=>{ if((mi+oi+ai)%3===2&&ai>0) return; const q=a[0].startsWith('Kit')?1:[2,3,4,5,6][(mi+ai+oi)%5]*(a[1]==='Dépliant'?1:1); const adr=(mi%4===1&&ai===1)?'Réserve arrière':(mi===3?'Entrepôt groupement Isère':'Adresse principale');
+ LIGNES.push({'Opération':op,'Enseigne':m[1],'Magasin':m[0],'Code magasin':'S2K'+(1040+mi),'Article':a[0],'Type de support':a[1],'Quantité':q,'Conditionnement':a[3],'Colis':Math.max(1,Math.ceil(q/(a[4]||1))),'Adresse de livraison':adr,'Adresse':m[2],'CP':m[3],'Ville':m[4],'Contact réception':m[5],'Horaires de réception':m[6],'Département':m[7],'Imprimeur':a[2],'Statut':STAT[(mi+ai)%STAT.length],'Montant HT':(q*[90,30,25,0,18][ai]),'Date de commande':'2027-0'+(4+oi)+'-'+String(10+mi).padStart(2,'0')}); n++; }))); })();
+const CHAMPS=Object.keys(LIGNES[0]);
+const PRESETS={
+ repartition:['Opération','Enseigne','Code magasin','Magasin','Article','Type de support','Quantité','Conditionnement','Imprimeur'],
+ transport:['Imprimeur','Magasin','Adresse de livraison','Adresse','CP','Ville','Contact réception','Horaires de réception','Article','Quantité','Conditionnement','Colis'],
+ commandes:['Opération','Enseigne','Magasin','Date de commande','Article','Quantité','Montant HT','Statut'],
+ libre:['Opération','Magasin','Article','Quantité'],
+};
+let PRESET='repartition';
+function champsInit(){const w=document.getElementById('x-champs'); w.innerHTML=''; CHAMPS.forEach(c=>{const l=document.createElement('label'); l.innerHTML='<input type="checkbox" value="'+c+'"> '+c; const i=l.querySelector('input'); i.addEventListener('change',()=>{l.classList.toggle('on',i.checked); requete();}); w.appendChild(l);});}
+function preset(p){PRESET=p; document.querySelectorAll('.presets button').forEach(b=>b.classList.toggle('active',b.dataset.p===p)); document.querySelectorAll('#x-champs input').forEach(i=>{i.checked=PRESETS[p].includes(i.value); i.parentElement.classList.toggle('on',i.checked);}); requete();}
+function donnees(){
+  const op=document.getElementById('x-op').value, ens=document.getElementById('x-ens').value;
+  const cols=[...document.querySelectorAll('#x-champs input:checked')].map(i=>i.value);
+  let rows=LIGNES.filter(r=>(!op||r['Opération']===op)&&(!ens||r['Enseigne']===ens));
+  if(PRESET==='transport'){ // agrege par imprimeur + adresse de livraison + article
+    const m=new Map(); rows.forEach(r=>{const k=[r['Imprimeur'],r['Magasin'],r['Adresse de livraison'],r['Article']].join('|'); if(!m.has(k)) m.set(k,{...r}); else {const e=m.get(k); e['Quantité']+=r['Quantité']; e['Colis']+=r['Colis'];}}); rows=[...m.values()].sort((a,b)=>(a['Imprimeur']+a['Magasin']).localeCompare(b['Imprimeur']+b['Magasin'])); }
+  return {cols, rows: rows.map(r=>cols.map(c=>r[c]))};
+}
+function requete(){
+  const {cols,rows}=donnees(); const t=document.getElementById('x-table');
+  t.innerHTML='<thead><tr>'+cols.map(c=>'<th>'+c+'</th>').join('')+'</tr></thead><tbody>'+rows.slice(0,10).map(r=>'<tr>'+r.map(v=>'<td>'+(typeof v==='number'&&String(v).includes('.')?v.toFixed(2):v)+'</td>').join('')+'</tr>').join('')+'</tbody>';
+  document.getElementById('x-count').textContent=rows.length+' lignes · '+cols.length+' colonnes · aperçu des 10 premières';
+}
+function exporter(fmt){
+  const {cols,rows}=donnees(); const nom={repartition:'Repartition_PLV',transport:'Plan_de_transport',commandes:'Extraction_commandes',libre:'Extraction'}[PRESET]+'_'+new Date().toISOString().slice(0,10);
+  if(fmt==='xlsx'&&window.XLSX){ const ws=XLSX.utils.aoa_to_sheet([cols,...rows]); ws['!cols']=cols.map(c=>({wch:Math.max(12,c.length+2)})); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,PRESET==='transport'?'Plan de transport':'Extraction'); XLSX.writeFile(wb,nom+'.xlsx'); toast('Fichier Excel généré : '+nom+'.xlsx'); return; }
+  const csv=[cols,...rows].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\n'); const b=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=nom+'.csv'; a.click(); toast('Fichier CSV généré : '+nom+'.csv'+(fmt==='xlsx'?' (Excel indisponible hors ligne)':''));
+}
+champsInit(); preset('repartition'); gabarit(); maj();
 function maj(){
   document.getElementById('p-promo').textContent=document.getElementById('f-promo').value;
+  const acc=document.getElementById('f-acc'); if(acc){document.getElementById('p-acc').textContent=acc.value; document.getElementById('f-acc-c').textContent=acc.value.length+' / 40';}
   document.getElementById('p-date').textContent=document.getElementById('f-date').value;
   document.getElementById('p-adr').textContent=document.getElementById('f-adr').value;
   document.getElementById('p-hor').textContent=document.getElementById('f-hor').value;
@@ -722,7 +1014,7 @@ btnInstallM.addEventListener('click', installer);
 window.addEventListener('appinstalled', () => { btnInstall.style.display = 'none'; btnInstallM.style.display = 'none'; });
 // Liens profonds vers un onglet (#cmd, #perso, #projet) pour les raccourcis du manifest
 const hash = location.hash.replace('#', '');
-if (['dash','cmd','boutique','perso','projet'].includes(hash)) go(hash);
+if (['dash','cmd','boutique','perso','projet','admin'].includes(hash)) go(hash);
 </script>
 <script>
 // ===== Assistant IA simulé : moteur de reponses par intentions, actions dans l'application =====
@@ -767,6 +1059,10 @@ if (['dash','cmd','boutique','perso','projet'].includes(hash)) go(hash);
       return {text:'Le BAT (bon à tirer) suit 3 étapes : 1) vous personnalisez et vérifiez l\'aperçu temps réel, 2) vous cliquez « Envoyer en validation », 3) la centrale relit et valide, vous êtes notifié. Aucune impression ne part sans cette validation. Votre BAT « Anniversaire 10 ans » est actuellement en validation.',acts:[{l:'Voir le BAT',f:()=>{go('perso');closeIa();}}]};
     if(/projet|depliant|jalon|agence|imprimeur/.test(n))
       return {text:'Un projet réunit tous les intervenants autour de 5 jalons : brief validé, dépôt des pages par l\'agence, relecture du BAT, validation HD, transmission des répartitions à l\'imprimeur. Les externes participent par lien sécurisé, sans compte. Pour créer un projet, la centrale renseigne le nom, l\'opération liée et l\'échéance d\'impression ; les jalons types se positionnent automatiquement.',acts:[{l:'Voir le projet Dépliant Noël',f:()=>{go('projet');closeIa();}}]};
+    if(/rapport|export|extract|repartition|plan de transport|excel/.test(n))
+      return {text:'L\'extracteur de la centrale sort vos rapports sans retraitement : répartition PLV par magasin, plan de transport par adresse de livraison (une ligne par adresse et par article, avec colis et contacts), extraction des commandes par opération. Une colonne par élément, export Excel ou CSV en un clic.',acts:[{l:'Ouvrir l\'extracteur',f:()=>{go('admin');onglet('extract');closeIa();}}]};
+    if(/adresse|livraison.*(reserve|entrepot|plusieurs)|plusieurs adresses/.test(n))
+      return {text:'Oui : chaque ligne de commande peut être livrée à une adresse différente (adresse principale, réserve arrière, entrepôt de groupement). Le plan de transport transmis à l\'imprimeur reprend ces adresses automatiquement.',acts:[{l:'Voir ma commande',f:()=>{go('cmd');closeIa();}}]};
     if(/kit|oblig|pacte|cooperatif/.test(n))
       return {text:'Le kit PLV obligatoire est le socle de chaque opération nationale, prévu par le pacte coopératif : étiquettes, gongoles, bandeaux podium. Si vous ne le commandez pas pendant la fenêtre, la centrale vous l\'attribue automatiquement. Le reste des supports (PLV, Akylux, stickers) est libre.',acts:[{l:'Voir le kit Rentrée',f:()=>{go('cmd');closeIa();}}]};
     if(/objet|pub|goodies|stock|sac|tenue|oriflamme/.test(n))

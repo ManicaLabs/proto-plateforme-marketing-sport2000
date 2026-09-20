@@ -43,6 +43,9 @@ Le prototype doit être installable (PWA) et fonctionner hors ligne après la pr
 
 ## 4. Détails à ne pas régresser
 
+- Extracteur : jeu de données `LIGNES` généré à l'initialisation (8 magasins × 3 opérations × 5 articles, avec trous) ; le modèle « transport » agrège par imprimeur + magasin + adresse + article. L'export Excel dépend de `window.XLSX` (script cdnjs, `defer`, mis en cache par le SW après la première visite) ; repli CSV automatique.
+- Gabarits : `ZONES_DEF` par format, un gabarit créé porte ses zones dans `data-zones` ; `gabarit()` masque champs et zones d'aperçu non ouverts.
+
 - Assistant : 100 % local et scripté (aucun appel réseau, fonctionne hors ligne), étiqueté « réponses simulées ». Moteur `answer(q)` par expressions régulières sur le texte normalisé (sans accents) ; `creerLocale(q)` extrait la remise (`NN %`) et la date (`JJ mois`) pour pré-remplir `#f-promo` / `#f-date`, appelle `maj()` et ajoute une opération `.op.loc.plan[data-ia]` sur la dernière ligne de la frise. Une seule opération créée par session (garde `data-ia`).
 
 - Charte : rouge `#D8121F`, noir `#17181C`, bandeau hachuré `.stripe` sous l'en-tête ; opérations locales en bleu `#1E5AA8` (pointillé = en préparation).
@@ -55,6 +58,7 @@ Le prototype doit être installable (PWA) et fonctionner hors ligne après la pr
 
 - ✅ v1.0 : 4 écrans, responsive, PWA installable, hors ligne, icônes, manifest, README.
 - ✅ v1.1 : URL de publication dans README et CDC.
+- ✅ v1.5 : écran Espace centrale (`#admin`, 3 onglets) : création de fiches produits (support d'opération nationale → apparaît dans Commander ; objet pub → apparaît dans la boutique), création de gabarits d'impression locale (zones ouvertes cochables → gabarit sélectionnable dans Personnaliser), extracteur de rapports (modèles Répartition PLV / Plan de transport / Commandes / libre, champs cochables, filtres, aperçu, export Excel via SheetJS cdnjs ou CSV en repli). Commander : adresse de livraison par ligne (principale / réserve / entrepôt groupement) reprise dans le plan de transport. Personnaliser : choix de gabarit, zones affichées selon le gabarit, accroche locale 40 caractères, photo locale (FileReader), export du fichier prêt à imprimer (canvas PNG, fonds perdus, traits de coupe). SW `pm-proto-v5`.
 - ✅ v1.4 : écran Objets publicitaires (boutique : 6 produits, circuits entrepôt / fournisseur, conditionnements, repiquage, alerte stock, panier par circuit avec franco fournisseur 150 €) ; 5e onglet dans les trois menus ; SW `pm-proto-v4`.
 - ✅ v1.3 : assistant IA simulé (bouton ✦, panneau de conversation, 9 intentions par mots-clés, actions dans l'app : navigation, pré-remplissage de la personnalisation, création d'une opération locale sur la frise, lecture du total) ; SW `pm-proto-v3`.
 - ✅ v1.2 : navigation mobile robuste (menu ☰ + tiroir, titre d'écran, barre basse conservée) ; SW `pm-proto-v2`.
