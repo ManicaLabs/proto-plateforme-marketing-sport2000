@@ -1246,10 +1246,12 @@ function gabPrixHTML(el){
   const T=el.tailleEntier||40, S=Math.round(T*(el.centimesStyle==='exposant'?0.42:0.5));
   const ent='<span style="font-size:'+T+'px">'+(el.entier||'0')+'</span>';
   const dev='<span style="font-size:'+S+'px">'+(el.devise||'€')+'</span>';
-  const sepVirgule=el.centimesStyle==='exposant'?'':',';
+  const sepVirgule=(el.centimesStyle==='exposant'||el.devisePosition==='milieu')?'':',';
   const centStyle='font-size:'+S+'px'+(el.centimesStyle==='exposant'?';position:relative;top:-'+Math.round(T*0.3)+'px':'');
   const cent='<span style="'+centStyle+'">'+sepVirgule+(el.centimes||'00')+'</span>';
-  return el.devisePosition==='avant' ? (dev+ent+cent) : (ent+cent+dev);
+  if(el.devisePosition==='avant')return dev+ent+cent;
+  if(el.devisePosition==='milieu')return ent+dev+cent;
+  return ent+cent+dev;
 }
 function gabRenderCanvas(){
   const host=document.getElementById('gab-canvas');
@@ -1331,7 +1333,7 @@ function gabRenderProps(){
       '</div>'+
       '<div class="row2">'+
         '<div class="field"><label>Devise</label><input id="gp-devise" maxlength="3" value="'+(el.devise||'').replace(/"/g,'&quot;')+'"></div>'+
-        '<div class="field"><label>Position devise</label><select id="gp-devpos"><option value="apres"'+(el.devisePosition==='apres'?' selected':'')+'>Après le prix</option><option value="avant"'+(el.devisePosition==='avant'?' selected':'')+'>Avant le prix</option></select></div>'+
+        '<div class="field"><label>Position devise</label><select id="gp-devpos"><option value="apres"'+(el.devisePosition==='apres'?' selected':'')+'>Après le prix</option><option value="avant"'+(el.devisePosition==='avant'?' selected':'')+'>Avant le prix</option><option value="milieu"'+(el.devisePosition==='milieu'?' selected':'')+'>Au milieu (entre l\'entier et les centimes)</option></select></div>'+
       '</div>'+
       '<div class="field"><label>Affichage des centimes</label><select id="gp-centstyle"><option value="exposant"'+(el.centimesStyle==='exposant'?' selected':'')+'>Exposant (19 € 90 en petit, en haut)</option><option value="normal"'+(el.centimesStyle==='normal'?' selected':'')+'>Normal (19,90 €)</option></select></div>'+
       '<div class="row2">'+
@@ -1668,17 +1670,21 @@ async function composerRenduCustom(g){
     }
     else if(el.type==='prix'){
       const T=Math.round((el.tailleEntier||40)*scaleFont), S=Math.round(T*(el.centimesStyle==='exposant'?0.42:0.5));
-      const fontBase=el.gras?'bold ':''; const entTxt=el.entier||'0', centTxt=(el.centimesStyle==='exposant'?'':',')+(el.centimes||'00'), devTxt=el.devise||'€';
+      const fontBase=el.gras?'bold ':''; const entTxt=el.entier||'0';
+      const sepVirgule=(el.centimesStyle==='exposant'||el.devisePosition==='milieu')?'':',';
+      const centTxt=sepVirgule+(el.centimes||'00'), devTxt=el.devise||'€';
       x.fillStyle=el.couleur; x.textBaseline='alphabetic';
       x.font=fontBase+T+'px Arial'; const wEnt=x.measureText(entTxt).width;
       x.font=fontBase+S+'px Arial'; const wCent=x.measureText(centTxt).width, wDev=x.measureText(devTxt).width;
-      const totalW=el.devisePosition==='avant'?wDev+wEnt+wCent:wEnt+wCent+wDev;
+      const totalW=wEnt+wCent+wDev;
       let cx=el.align==='center'?ex+(ew-totalW)/2:el.align==='right'?ex+ew-totalW:ex;
       const baseline=ey+T*0.85;
-      if(el.devisePosition==='avant'){ x.font=fontBase+S+'px Arial'; x.fillText(devTxt,cx,baseline); cx+=wDev; }
-      x.font=fontBase+T+'px Arial'; x.fillText(entTxt,cx,baseline); cx+=wEnt;
-      x.font=fontBase+S+'px Arial'; x.fillText(centTxt,cx,el.centimesStyle==='exposant'?baseline-T*0.3:baseline); cx+=wCent;
-      if(el.devisePosition!=='avant'){ x.fillText(devTxt,cx,baseline); }
+      const dessinerDev=()=>{ x.font=fontBase+S+'px Arial'; x.fillText(devTxt,cx,baseline); cx+=wDev; };
+      const dessinerEnt=()=>{ x.font=fontBase+T+'px Arial'; x.fillText(entTxt,cx,baseline); cx+=wEnt; };
+      const dessinerCent=()=>{ x.font=fontBase+S+'px Arial'; x.fillText(centTxt,cx,el.centimesStyle==='exposant'?baseline-T*0.3:baseline); cx+=wCent; };
+      if(el.devisePosition==='avant'){ dessinerDev(); dessinerEnt(); dessinerCent(); }
+      else if(el.devisePosition==='milieu'){ dessinerEnt(); dessinerDev(); dessinerCent(); }
+      else { dessinerEnt(); dessinerCent(); dessinerDev(); }
     }
     else if(el.champ==='photo'){
       if(PHOTO_DATAURL){
