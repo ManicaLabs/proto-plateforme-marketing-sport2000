@@ -771,6 +771,7 @@ body.menu-open{overflow:hidden}
         <button class="btn ghost" type="button" onclick="gabAjouterElement('rect')">+ Rectangle</button>
         <button class="btn ghost" type="button" onclick="gabAjouterElement('cercle')">+ Cercle</button>
         <button class="btn ghost" type="button" onclick="gabAjouterElement('zone')">+ Zone</button>
+        <button class="btn ghost" type="button" onclick="gabAjouterElement('prix')">+ Prix</button>
         <button class="btn ghost" type="button" onclick="gabSupprimerSelection()">Supprimer l'élément sélectionné</button>
       </div>
     </div>
@@ -1103,11 +1104,20 @@ function gabChargerFond(inp){
 }
 function gabAjouterElement(type){
   const id='el'+(++GAB_SEQ); const n=gabState.elements.length;
-  const el={id,type,x:10+(n*9)%60,y:10+(n*13)%55,w:35,h:type==='zone'?15:20};
-  if(type==='rect'){el.couleur='#D8121F';el.opacite=1;}
-  else if(type==='cercle'){el.couleur='#17181C';el.opacite=1;}
+  const el={id,type,x:10+(n*9)%60,y:10+(n*13)%55,w:35,h:(type==='zone'||type==='prix')?15:20};
+  if(type==='rect'){el.couleur='#D8121F';el.opacite=1;el.bordureCouleur='#17181C';el.bordureEpaisseur=0;el.radius=0;}
+  else if(type==='cercle'){el.couleur='#17181C';el.opacite=1;el.bordureCouleur='#17181C';el.bordureEpaisseur=0;}
+  else if(type==='prix'){el.entier='19';el.centimes='90';el.devise='€';el.devisePosition='apres';el.centimesStyle='exposant';el.police='Barlow Condensed';el.tailleEntier=40;el.couleur='#D8121F';el.gras=true;el.align='left';}
   else {el.champ='accroche';el.texte='Votre texte';el.police='Inter';el.taille=16;el.couleur='#17181C';el.align='left';el.gras=false;}
   gabState.elements.push(el); gabSelectionner(id);
+}
+function gabDeplacerZ(dir){
+  const arr=gabState.elements, i=arr.findIndex(e=>e.id===gabState.selected); if(i<0)return;
+  if(dir==='up'&&i<arr.length-1){[arr[i],arr[i+1]]=[arr[i+1],arr[i]];}
+  else if(dir==='down'&&i>0){[arr[i],arr[i-1]]=[arr[i-1],arr[i]];}
+  else if(dir==='front'){arr.push(arr.splice(i,1)[0]);}
+  else if(dir==='back'){arr.unshift(arr.splice(i,1)[0]);}
+  gabRenderCanvas();
 }
 function gabSupprimerSelection(){
   if(!gabState.selected)return;
@@ -1120,6 +1130,15 @@ function gabValeurAffichee(el){
   if(el.champ==='photo')return '';
   return GAB_SAMPLE[el.champ]||'';
 }
+function gabPrixHTML(el){
+  const T=el.tailleEntier||40, S=Math.round(T*(el.centimesStyle==='exposant'?0.42:0.5));
+  const ent='<span style="font-size:'+T+'px">'+(el.entier||'0')+'</span>';
+  const dev='<span style="font-size:'+S+'px">'+(el.devise||'€')+'</span>';
+  const sepVirgule=el.centimesStyle==='exposant'?'':',';
+  const centStyle='font-size:'+S+'px'+(el.centimesStyle==='exposant'?';position:relative;top:-'+Math.round(T*0.3)+'px':'');
+  const cent='<span style="'+centStyle+'">'+sepVirgule+(el.centimes||'00')+'</span>';
+  return el.devisePosition==='avant' ? (dev+ent+cent) : (ent+cent+dev);
+}
 function gabRenderCanvas(){
   const host=document.getElementById('gab-canvas');
   host.style.backgroundImage=gabState.fond?'url('+gabState.fond+')':'none';
@@ -1127,8 +1146,20 @@ function gabRenderCanvas(){
   gabState.elements.forEach(el=>{
     const d=document.createElement('div'); d.className='gab-el'+(el.id===gabState.selected?' sel':'');
     d.style.left=el.x+'%'; d.style.top=el.y+'%'; d.style.width=el.w+'%'; d.style.height=el.h+'%';
-    if(el.type==='rect'){ d.style.background=el.couleur; d.style.opacity=el.opacite; }
-    else if(el.type==='cercle'){ d.style.background=el.couleur; d.style.opacity=el.opacite; d.style.borderRadius='50%'; }
+    if(el.type==='rect'){
+      d.style.background=el.couleur; d.style.opacity=el.opacite; d.style.borderRadius=(el.radius||0)+'px';
+      if(el.bordureEpaisseur>0) d.style.border=el.bordureEpaisseur+'px solid '+el.bordureCouleur;
+    }
+    else if(el.type==='cercle'){
+      d.style.background=el.couleur; d.style.opacity=el.opacite; d.style.borderRadius='50%';
+      if(el.bordureEpaisseur>0) d.style.border=el.bordureEpaisseur+'px solid '+el.bordureCouleur;
+    }
+    else if(el.type==='prix'){
+      d.style.fontFamily=el.police==='Barlow Condensed'?"'Barlow Condensed',sans-serif":"'Inter',sans-serif";
+      d.style.color=el.couleur; d.style.fontWeight=el.gras?'700':'400'; d.style.whiteSpace='nowrap';
+      d.style.alignItems='center'; d.style.justifyContent=el.align==='center'?'center':el.align==='right'?'flex-end':'flex-start';
+      d.innerHTML=gabPrixHTML(el);
+    }
     else if(el.champ==='photo'){ d.classList.add('photo-vide'); d.textContent='Photo locale'; }
     else {
       d.style.fontFamily=el.police==='Barlow Condensed'?"'Barlow Condensed',sans-serif":"'Inter',sans-serif";
@@ -1163,21 +1194,66 @@ function gabRenderProps(){
         '</div>'+
         '<div class="checks"><label class="'+(el.gras?'on':'')+'"><input type="checkbox" id="gp-gras"'+(el.gras?' checked':'')+'> Gras</label></div>'
       ):'<div class="s">La zone affichera la photo envoyée par le magasin dans Personnaliser (ou un espace réservé si aucune photo).</div>');
+  } else if(el.type==='prix'){
+    const ALIGN_OPTS='<option value="left"'+(el.align==='left'?' selected':'')+'>Gauche</option><option value="center"'+(el.align==='center'?' selected':'')+'>Centre</option><option value="right"'+(el.align==='right'?' selected':'')+'>Droite</option>';
+    host.innerHTML='<h3>Zone prix</h3>'+
+      '<div class="row2">'+
+        '<div class="field"><label>Prix (entier)</label><input id="gp-entier" value="'+(el.entier||'').replace(/"/g,'&quot;')+'"></div>'+
+        '<div class="field"><label>Centimes</label><input id="gp-centimes" value="'+(el.centimes||'').replace(/"/g,'&quot;')+'"></div>'+
+      '</div>'+
+      '<div class="row2">'+
+        '<div class="field"><label>Devise</label><input id="gp-devise" maxlength="3" value="'+(el.devise||'').replace(/"/g,'&quot;')+'"></div>'+
+        '<div class="field"><label>Position devise</label><select id="gp-devpos"><option value="apres"'+(el.devisePosition==='apres'?' selected':'')+'>Après le prix</option><option value="avant"'+(el.devisePosition==='avant'?' selected':'')+'>Avant le prix</option></select></div>'+
+      '</div>'+
+      '<div class="field"><label>Affichage des centimes</label><select id="gp-centstyle"><option value="exposant"'+(el.centimesStyle==='exposant'?' selected':'')+'>Exposant (19 € 90 en petit, en haut)</option><option value="normal"'+(el.centimesStyle==='normal'?' selected':'')+'>Normal (19,90 €)</option></select></div>'+
+      '<div class="row2">'+
+        '<div class="field"><label>Police</label><select id="gp-police"><option'+(el.police==='Inter'?' selected':'')+'>Inter</option><option'+(el.police==='Barlow Condensed'?' selected':'')+'>Barlow Condensed</option></select></div>'+
+        '<div class="field"><label>Taille (px)</label><input id="gp-tailleentier" type="number" value="'+el.tailleEntier+'" min="12" max="100"></div>'+
+      '</div>'+
+      '<div class="row2">'+
+        '<div class="field"><label>Couleur</label><input id="gp-couleur" type="color" value="'+el.couleur+'" style="height:36px"></div>'+
+        '<div class="field"><label>Alignement</label><select id="gp-align">'+ALIGN_OPTS+'</select></div>'+
+      '</div>'+
+      '<div class="checks"><label class="'+(el.gras?'on':'')+'"><input type="checkbox" id="gp-gras"'+(el.gras?' checked':'')+'> Gras</label></div>';
   } else {
     host.innerHTML='<h3>'+(el.type==='rect'?'Rectangle':'Cercle')+'</h3>'+
-      '<div class="field"><label>Couleur</label><input id="gp-couleur" type="color" value="'+el.couleur+'" style="height:36px"></div>'+
-      '<div class="field"><label>Opacité</label><input id="gp-opacite" type="range" min="10" max="100" value="'+Math.round(el.opacite*100)+'"></div>';
+      '<div class="row2">'+
+        '<div class="field"><label>Couleur</label><input id="gp-couleur" type="color" value="'+el.couleur+'" style="height:36px"></div>'+
+        '<div class="field"><label>Opacité</label><input id="gp-opacite" type="range" min="10" max="100" value="'+Math.round(el.opacite*100)+'"></div>'+
+      '</div>'+
+      '<div class="row2">'+
+        '<div class="field"><label>Bordure - couleur</label><input id="gp-bordcouleur" type="color" value="'+(el.bordureCouleur||'#17181C')+'" style="height:36px"></div>'+
+        '<div class="field"><label>Bordure - épaisseur (px)</label><input id="gp-bordepais" type="number" min="0" max="20" value="'+(el.bordureEpaisseur||0)+'"></div>'+
+      '</div>'+
+      (el.type==='rect'?'<div class="field"><label>Arrondi des angles (px)</label><input id="gp-radius" type="number" min="0" max="100" value="'+(el.radius||0)+'"></div>':'');
   }
-  host.innerHTML+='<button class="btn ghost" style="margin-top:10px;width:100%" onclick="gabSupprimerSelection()">Supprimer cet élément</button>';
+  host.innerHTML+='<div class="row2" style="margin-top:12px">'+
+      '<button class="btn ghost" type="button" onclick="gabDeplacerZ(\'back\')">Arrière-plan</button>'+
+      '<button class="btn ghost" type="button" onclick="gabDeplacerZ(\'front\')">Premier plan</button>'+
+    '</div>'+
+    '<div class="row2" style="margin-top:8px">'+
+      '<button class="btn ghost" type="button" onclick="gabDeplacerZ(\'down\')">◂ Reculer</button>'+
+      '<button class="btn ghost" type="button" onclick="gabDeplacerZ(\'up\')">Avancer ▸</button>'+
+    '</div>'+
+    '<button class="btn ghost" style="margin-top:10px;width:100%" onclick="gabSupprimerSelection()">Supprimer cet élément</button>';
   const bind=(elId,evt,fn)=>{const n=document.getElementById(elId); if(n)n.addEventListener(evt,fn);};
   bind('gp-champ','change',e=>{el.champ=e.target.value; if(el.champ==='libre'&&!el.texte)el.texte='Votre texte'; gabRenderCanvas(); gabRenderProps();});
   bind('gp-texte','input',e=>{el.texte=e.target.value; gabRenderCanvas();});
   bind('gp-police','change',e=>{el.police=e.target.value; gabRenderCanvas();});
   bind('gp-taille','input',e=>{el.taille=parseInt(e.target.value||16); gabRenderCanvas();});
+  bind('gp-tailleentier','input',e=>{el.tailleEntier=parseInt(e.target.value||40); gabRenderCanvas();});
   bind('gp-couleur','input',e=>{el.couleur=e.target.value; gabRenderCanvas();});
   bind('gp-align','change',e=>{el.align=e.target.value; gabRenderCanvas();});
   bind('gp-gras','change',e=>{el.gras=e.target.checked; e.target.closest('label').classList.toggle('on',el.gras); gabRenderCanvas();});
   bind('gp-opacite','input',e=>{el.opacite=parseInt(e.target.value)/100; gabRenderCanvas();});
+  bind('gp-bordcouleur','input',e=>{el.bordureCouleur=e.target.value; gabRenderCanvas();});
+  bind('gp-bordepais','input',e=>{el.bordureEpaisseur=parseInt(e.target.value||0); gabRenderCanvas();});
+  bind('gp-radius','input',e=>{el.radius=parseInt(e.target.value||0); gabRenderCanvas();});
+  bind('gp-entier','input',e=>{el.entier=e.target.value; gabRenderCanvas();});
+  bind('gp-centimes','input',e=>{el.centimes=e.target.value; gabRenderCanvas();});
+  bind('gp-devise','input',e=>{el.devise=e.target.value; gabRenderCanvas();});
+  bind('gp-devpos','change',e=>{el.devisePosition=e.target.value; gabRenderCanvas();});
+  bind('gp-centstyle','change',e=>{el.centimesStyle=e.target.value; gabRenderCanvas();});
 }
 function gabStartDrag(e){
   if(e.target.classList.contains('gab-handle'))return;
@@ -1272,8 +1348,20 @@ function renderGabaritCustom(g){
   g.elements.forEach(el=>{
     const d=document.createElement('div'); d.className='gab-render-el';
     d.style.left=el.x+'%'; d.style.top=el.y+'%'; d.style.width=el.w+'%'; d.style.height=el.h+'%';
-    if(el.type==='rect'){ d.style.background=el.couleur; d.style.opacity=el.opacite; }
-    else if(el.type==='cercle'){ d.style.background=el.couleur; d.style.opacity=el.opacite; d.style.borderRadius='50%'; }
+    if(el.type==='rect'){
+      d.style.background=el.couleur; d.style.opacity=el.opacite; d.style.borderRadius=(el.radius||0)+'px';
+      if(el.bordureEpaisseur>0) d.style.border=el.bordureEpaisseur+'px solid '+el.bordureCouleur;
+    }
+    else if(el.type==='cercle'){
+      d.style.background=el.couleur; d.style.opacity=el.opacite; d.style.borderRadius='50%';
+      if(el.bordureEpaisseur>0) d.style.border=el.bordureEpaisseur+'px solid '+el.bordureCouleur;
+    }
+    else if(el.type==='prix'){
+      d.style.fontFamily=el.police==='Barlow Condensed'?"'Barlow Condensed',sans-serif":"'Inter',sans-serif";
+      d.style.color=el.couleur; d.style.fontWeight=el.gras?'700':'400'; d.style.whiteSpace='nowrap';
+      d.style.display='flex'; d.style.alignItems='center'; d.style.justifyContent=el.align==='center'?'center':el.align==='right'?'flex-end':'flex-start';
+      d.innerHTML=gabPrixHTML(el);
+    }
     else if(el.champ==='photo'){
       if(PHOTO_DATAURL){ d.style.background='url('+PHOTO_DATAURL+') center/cover no-repeat'; }
       else { d.style.background='#EDEBE8'; d.style.display='flex'; d.style.alignItems='center'; d.style.justifyContent='center'; d.style.color='#B9B6B1'; d.style.fontSize='11px'; d.style.fontWeight='600'; d.textContent='Photo locale'; }
@@ -1347,8 +1435,31 @@ async function composerRenduCustom(g){
   const scaleFont=GAB_CANVAS_PX[g.format]/GAB_REF_WIDTH[g.format];
   for(const el of g.elements){
     const ex=el.x/100*c.width, ey=el.y/100*c.height, ew=el.w/100*c.width, eh=el.h/100*c.height;
-    if(el.type==='rect'){ x.globalAlpha=el.opacite; x.fillStyle=el.couleur; x.fillRect(ex,ey,ew,eh); x.globalAlpha=1; }
-    else if(el.type==='cercle'){ x.globalAlpha=el.opacite; x.fillStyle=el.couleur; x.beginPath(); x.ellipse(ex+ew/2,ey+eh/2,ew/2,eh/2,0,0,Math.PI*2); x.fill(); x.globalAlpha=1; }
+    if(el.type==='rect'){
+      const rad=(el.radius||0)*scaleFont;
+      x.globalAlpha=el.opacite; x.fillStyle=el.couleur;
+      x.beginPath(); if(rad>0)x.roundRect(ex,ey,ew,eh,rad); else x.rect(ex,ey,ew,eh); x.fill(); x.globalAlpha=1;
+      if(el.bordureEpaisseur>0){ x.strokeStyle=el.bordureCouleur; x.lineWidth=el.bordureEpaisseur*scaleFont;
+        x.beginPath(); if(rad>0)x.roundRect(ex,ey,ew,eh,rad); else x.rect(ex,ey,ew,eh); x.stroke(); }
+    }
+    else if(el.type==='cercle'){
+      x.globalAlpha=el.opacite; x.fillStyle=el.couleur; x.beginPath(); x.ellipse(ex+ew/2,ey+eh/2,ew/2,eh/2,0,0,Math.PI*2); x.fill(); x.globalAlpha=1;
+      if(el.bordureEpaisseur>0){ x.strokeStyle=el.bordureCouleur; x.lineWidth=el.bordureEpaisseur*scaleFont; x.beginPath(); x.ellipse(ex+ew/2,ey+eh/2,ew/2,eh/2,0,0,Math.PI*2); x.stroke(); }
+    }
+    else if(el.type==='prix'){
+      const T=Math.round((el.tailleEntier||40)*scaleFont), S=Math.round(T*(el.centimesStyle==='exposant'?0.42:0.5));
+      const fontBase=el.gras?'bold ':''; const entTxt=el.entier||'0', centTxt=(el.centimesStyle==='exposant'?'':',')+(el.centimes||'00'), devTxt=el.devise||'€';
+      x.fillStyle=el.couleur; x.textBaseline='alphabetic';
+      x.font=fontBase+T+'px Arial'; const wEnt=x.measureText(entTxt).width;
+      x.font=fontBase+S+'px Arial'; const wCent=x.measureText(centTxt).width, wDev=x.measureText(devTxt).width;
+      const totalW=el.devisePosition==='avant'?wDev+wEnt+wCent:wEnt+wCent+wDev;
+      let cx=el.align==='center'?ex+(ew-totalW)/2:el.align==='right'?ex+ew-totalW:ex;
+      const baseline=ey+T*0.85;
+      if(el.devisePosition==='avant'){ x.font=fontBase+S+'px Arial'; x.fillText(devTxt,cx,baseline); cx+=wDev; }
+      x.font=fontBase+T+'px Arial'; x.fillText(entTxt,cx,baseline); cx+=wEnt;
+      x.font=fontBase+S+'px Arial'; x.fillText(centTxt,cx,el.centimesStyle==='exposant'?baseline-T*0.3:baseline); cx+=wCent;
+      if(el.devisePosition!=='avant'){ x.fillText(devTxt,cx,baseline); }
+    }
     else if(el.champ==='photo'){
       if(PHOTO_DATAURL){
         const img=await chargerImage(PHOTO_DATAURL); x.save(); x.beginPath(); x.rect(ex,ey,ew,eh); x.clip();
