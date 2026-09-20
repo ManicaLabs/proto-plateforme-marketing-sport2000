@@ -110,6 +110,9 @@ h1{font-family:'Barlow Condensed';font-weight:700;font-size:30px;letter-spacing:
 .recap .note{font-size:11px;color:var(--gris);margin-top:8px;line-height:1.45}
 .recap .btn{width:100%;margin-top:14px}
 .recap .btn.ghost{margin-top:8px}
+.confirm-box{background:var(--vert-pale);border:1px solid #BFE3CB;border-radius:8px;padding:12px 14px;font-size:12.5px;color:#1E7A3C;margin-top:12px;line-height:1.5}
+.confirm-box b{display:block;font-size:13.5px;margin-bottom:4px;color:var(--noir)}
+.qty input:disabled,.qty button:disabled,select:disabled{opacity:.5;cursor:not-allowed}
 .quest{padding:16px 18px}
 .quest .q{margin-bottom:14px}
 .quest .q p{font-size:13px;font-weight:600;margin-bottom:7px}
@@ -404,8 +407,8 @@ body.menu-open{overflow:hidden}
   </div>
 
   <div class="kpis">
-    <div class="card kpi hot"><div class="n">2</div><div class="l">Commandes obligatoires<br>à compléter</div></div>
-    <div class="card kpi"><div class="n">5</div><div class="l">Commandes validées<br>ce semestre</div></div>
+    <div class="card kpi hot"><div class="n" id="kpi-oblig">2</div><div class="l">Commandes obligatoires<br>à compléter</div></div>
+    <div class="card kpi"><div class="n" id="kpi-validees">5</div><div class="l">Commandes validées<br>ce semestre</div></div>
     <div class="card kpi"><div class="n">3</div><div class="l">Opérations locales<br>planifiées</div></div>
     <div class="card kpi"><div class="n">1</div><div class="l">BAT en attente<br>de validation centrale</div></div>
   </div>
@@ -426,7 +429,7 @@ body.menu-open{overflow:hidden}
       <span class="lab">Conquête</span>
       <div class="op nat done" style="grid-column:2/span 2">SOLDES HIVER<small>Commandée ✓</small></div>
       <div class="op nat done" style="grid-column:5/span 2">BEAUX JOURS<small>Commandée ✓</small></div>
-      <div class="op nat todo" style="grid-column:9/span 2" onclick="go('cmd')">RENTRÉE DES CLASSES<small>À compléter - obligatoire</small></div>
+      <div class="op nat todo" id="frise-rentree" style="grid-column:9/span 2" onclick="go('cmd')">RENTRÉE DES CLASSES<small>À compléter - obligatoire</small></div>
       <div class="op nat" style="grid-column:12/span 1">NOËL<small>Ouvre le 01/06</small></div>
     </div>
     <div class="ligne-op">
@@ -465,7 +468,7 @@ body.menu-open{overflow:hidden}
 
   <div class="commande-grid">
     <div>
-      <div class="card">
+      <div class="card" id="kit-card">
         <div class="section-t">Kit obligatoire <span class="chip warn">Requis - pacte coopératif</span></div>
         <div class="article">
           <div class="ph">KIT PLV</div>
@@ -477,7 +480,7 @@ body.menu-open{overflow:hidden}
         <div style="height:12px"></div>
       </div>
       <div style="height:14px"></div>
-      <div class="card">
+      <div class="card" id="plv-card">
         <div class="section-t">PLV - supports du point de vente</div>
         <div class="article">
           <div class="ph">PLV<br>120×80</div>
@@ -524,8 +527,16 @@ body.menu-open{overflow:hidden}
         <div class="adr-note" id="r-adr-detail">Adresse principale pour toutes les lignes. Chaque ligne peut être livrée à une adresse différente (réserve, entrepôt de groupement) : le plan de transport en tient compte.</div>
         <div class="total"><span>Total HT</span><span class="v" id="r-total">175,00 €</span></div>
         <div class="note">Affichage indicatif - facturation ou prise en charge (totale/partielle) par la centrale. Aucun paiement en ligne.</div>
-        <button class="btn rouge" onclick="alert('Commande validée - confirmation envoyée par e-mail avec le détail et les CGV.')">Valider ma commande</button>
-        <button class="btn ghost">Enregistrer le brouillon</button>
+        <div id="cmd-actions">
+          <button class="btn rouge" onclick="validerCommande()">Valider ma commande</button>
+          <button class="btn ghost" onclick="brouillon()">Enregistrer le brouillon</button>
+        </div>
+        <div class="confirm-box" id="cmd-confirme" style="display:none">
+          <b>✓ Commande enregistrée</b>
+          <span id="cmd-num"></span><br>
+          Confirmation envoyée par e-mail avec le détail et les CGV. La centrale traite votre commande selon les règles du pacte coopératif.
+          <button class="btn ghost" style="margin-top:10px;width:100%" onclick="modifierCommande()">Modifier ma commande</button>
+        </div>
       </div>
     </div>
   </div>
@@ -556,8 +567,16 @@ body.menu-open{overflow:hidden}
         <div class="total"><span>Total HT</span><span class="v" id="b-total">0,00 €</span></div>
         <div class="franco"><span id="b-franco-txt">Franco fournisseur</span><div class="bar"><i id="b-franco-bar" style="width:0%"></i></div></div>
         <div class="note">Entrepôt : expédition sous 48 h. Fournisseur : bon de commande envoyé automatiquement au prestataire, franco de port à partir de 150 € HT.</div>
-        <button class="btn rouge" onclick="alert('Commande validée. Bons de commande générés : 1 vers l\'entrepôt central, 1 vers le fournisseur. Confirmation envoyée par e-mail.')">Valider ma commande</button>
-        <button class="btn ghost">Enregistrer le brouillon</button>
+        <div id="bou-actions">
+          <button class="btn rouge" onclick="validerBoutique()">Valider ma commande</button>
+          <button class="btn ghost" onclick="brouillon()">Enregistrer le brouillon</button>
+        </div>
+        <div class="confirm-box" id="bou-confirme" style="display:none">
+          <b>✓ Commande enregistrée</b>
+          <span id="bou-num"></span><br>
+          Bons de commande générés : <span id="bou-bons"></span>. Confirmation envoyée par e-mail.
+          <button class="btn ghost" style="margin-top:10px;width:100%" onclick="modifierBoutique()">Modifier mon panier</button>
+        </div>
       </div>
     </div>
   </div>
@@ -841,13 +860,11 @@ function q(btn,delta){
 }
 function tot(){
   let kit=0,plv=0;
-  document.querySelectorAll('#cmd .card').forEach((card,ci)=>{
-    card.querySelectorAll('.article').forEach(a=>{
-      const inp=a.querySelector('input[data-pu]');if(!inp)return;
-      const line=parseInt(inp.value||0)*parseFloat(inp.dataset.pu);
-      a.querySelector('[data-l]').textContent=line.toFixed(2).replace('.',',')+' €';
-      if(ci===0)kit+=line;else plv+=line;
-    });
+  document.querySelectorAll('#cmd .article').forEach(a=>{
+    const inp=a.querySelector('input[data-pu]');if(!inp)return;
+    const line=parseInt(inp.value||0)*parseFloat(inp.dataset.pu);
+    a.querySelector('[data-l]').textContent=line.toFixed(2).replace('.',',')+' €';
+    if(a.closest('#kit-card'))kit+=line;else plv+=line;
   });
   document.getElementById('r-kit').textContent=kit.toFixed(2).replace('.',',')+' €';
   document.getElementById('r-plv').textContent=plv.toFixed(2).replace('.',',')+' €';
@@ -880,6 +897,48 @@ adrMaj();
 // ---------- toast ----------
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2600);}
 
+// ---------- parcours de commande : validation reelle (etat memoire, pas de persistance) ----------
+function orderNum(prefix){return prefix+'-2027-'+String(Math.floor(1000+Math.random()*9000));}
+function horodatage(){return new Date().toLocaleDateString('fr-FR')+' à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}
+function majKpi(id,delta){const el=document.getElementById(id); if(!el)return; el.textContent=Math.max(0,parseInt(el.textContent||0)+delta);}
+function brouillon(){toast('Brouillon enregistré (mémoire de session uniquement, réinitialisé au rechargement)');}
+function validerCommande(){
+  const num=orderNum('CMD');
+  document.getElementById('cmd-num').textContent='N° '+num+' · '+horodatage();
+  document.getElementById('cmd-actions').style.display='none';
+  document.getElementById('cmd-confirme').style.display='block';
+  document.querySelectorAll('#cmd .qty input, #cmd .qty button, #cmd select.adr, #cmd input[type=radio]').forEach(el=>el.disabled=true);
+  const fr=document.getElementById('frise-rentree');
+  if(fr){fr.classList.remove('todo');fr.classList.add('done');fr.innerHTML='RENTRÉE DES CLASSES<small>Commandée ✓</small>';fr.onclick=null;fr.style.cursor='default';}
+  majKpi('kpi-oblig',-1); majKpi('kpi-validees',1);
+  toast('Commande '+num+' enregistrée');
+}
+function modifierCommande(){
+  document.getElementById('cmd-actions').style.display='';
+  document.getElementById('cmd-confirme').style.display='none';
+  document.querySelectorAll('#cmd .qty input, #cmd .qty button, #cmd select.adr, #cmd input[type=radio]').forEach(el=>el.disabled=false);
+  const fr=document.getElementById('frise-rentree');
+  if(fr){fr.classList.remove('done');fr.classList.add('todo');fr.innerHTML='RENTRÉE DES CLASSES<small>À compléter - obligatoire</small>';fr.onclick=()=>go('cmd');fr.style.cursor='pointer';}
+  majKpi('kpi-oblig',1); majKpi('kpi-validees',-1);
+}
+function validerBoutique(){
+  const eur2n=t=>parseFloat((t||'0').replace(/[^\d,.-]/g,'').replace(',','.'))||0;
+  const ent=eur2n(document.getElementById('b-ent').textContent), four=eur2n(document.getElementById('b-four').textContent);
+  const bons=[]; if(ent>0)bons.push('1 vers l\'entrepôt central'); if(four>0)bons.push('1 vers le fournisseur');
+  const num=orderNum('OBJ');
+  document.getElementById('bou-num').textContent='N° '+num+' · '+horodatage();
+  document.getElementById('bou-bons').textContent=bons.length?bons.join(' et '):'aucun (panier vide)';
+  document.getElementById('bou-actions').style.display='none';
+  document.getElementById('bou-confirme').style.display='block';
+  document.querySelectorAll('#boutique .qty input, #boutique .qty button').forEach(el=>el.disabled=true);
+  toast('Commande '+num+' enregistrée');
+}
+function modifierBoutique(){
+  document.getElementById('bou-actions').style.display='';
+  document.getElementById('bou-confirme').style.display='none';
+  document.querySelectorAll('#boutique .qty input, #boutique .qty button').forEach(el=>el.disabled=false);
+}
+
 // ---------- espace centrale : onglets ----------
 function onglet(id){document.querySelectorAll('#admin .onglets button').forEach(b=>b.classList.toggle('active',b.dataset.o===id));document.querySelectorAll('#admin .sous').forEach(d=>d.classList.toggle('active',d.id==='sous-'+id));}
 document.querySelectorAll('.checks label').forEach(l=>{const c=l.querySelector('input');if(c)c.addEventListener('change',()=>l.classList.toggle('on',c.checked));});
@@ -890,8 +949,8 @@ function creerSupport(){
   const op=document.getElementById('a1-op').value, type=document.getElementById('a1-type').value, prix=parseFloat(document.getElementById('a1-prix').value||0);
   const oblig=document.getElementById('a1-oblig').checked;
   const l=document.getElementById('a1-liste'); const d=document.createElement('div'); d.innerHTML='<span>'+nom+(oblig?' <span class="chip warn" style="font-size:9.5px">obligatoire</span>':'')+'</span><span>'+op+' · '+type+' · '+prix.toFixed(2).replace('.',',')+' €</span>'; l.prepend(d);
-  // apparait dans l'ecran Commander
-  const card=document.querySelectorAll('#cmd .card')[1]; const a=document.createElement('div'); a.className='article';
+  // apparait dans l'ecran Commander, dans la carte kit si obligatoire, sinon dans la carte PLV
+  const card=document.getElementById(oblig?'kit-card':'plv-card'); const a=document.createElement('div'); a.className='article';
   a.innerHTML='<div class="ph">'+type.toUpperCase().slice(0,7)+'</div><div class="inf"><b>'+nom+'</b><span>Créé par la centrale · '+op+(oblig?' · obligatoire':'')+'</span></div><div class="qty"><button onclick="q(this,-1)">−</button><input value="'+(oblig?1:0)+'" data-pu="'+prix+'" onchange="tot()"><button onclick="q(this,1)">+</button></div>'+'<select class="adr" onchange="adrMaj()"><option value="p">Adresse principale</option><option value="r">Réserve arrière (livraisons)</option><option value="g">Entrepôt groupement Isère</option></select><div class="prix" data-l>0,00 €</div>';
   card.appendChild(a); tot(); toast('Support « '+nom+' » publié dans la commande des magasins');
   document.getElementById('a1-nom').value='';

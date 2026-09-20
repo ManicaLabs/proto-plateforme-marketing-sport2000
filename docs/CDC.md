@@ -52,12 +52,13 @@ Le prototype doit être installable (PWA) et fonctionner hors ligne après la pr
 
 - Charte : rouge `#D8121F`, noir `#17181C`, bandeau hachuré `.stripe` sous l'en-tête ; opérations locales en bleu `#1E5AA8` (pointillé = en préparation).
 - Frise : grille 12 colonnes (`grid-column: N/span M`), `min-width: 920px` en mobile pour défilement horizontal.
-- Commande : `tot()` recalcule kit / PLV / total (desktop et barre mobile `#r-total-m`) ; avertissement d'attribution automatique du kit obligatoire.
+- Commande : `tot()` recalcule kit / PLV / total (desktop et barre mobile `#r-total-m`), en distinguant les deux via les cartes `#kit-card` / `#plv-card` (ne pas revenir à un repérage par index) ; avertissement d'attribution automatique du kit obligatoire. `validerCommande()`/`modifierCommande()` et `validerBoutique()`/`modifierBoutique()` gèrent la confirmation de commande (numéro, verrouillage des champs, synchronisation frise/KPI) - état mémoire uniquement.
 - Personnalisation : `maj()` recopie les champs dans l'aperçu ; zone créative verrouillée non éditable (principe du CDC client).
 - Aucun tiret cadratin dans les textes (règle Manica) : utiliser « - ».
 
 ## 5. État d'avancement
 
+- ✅ v1.7 : parcours de commande réel sur Commander et Objets pub. « Valider ma commande » n'ouvre plus une simple alerte : un numéro de commande est généré, un encart de confirmation (vert) remplace les boutons, les champs de quantité/adresse sont verrouillés, avec un bouton « Modifier » pour revenir en édition (état mémoire de session, non persistant - cohérent avec le choix déjà fait de ne pas utiliser `localStorage`). La validation sur Commander synchronise aussi le tableau de bord : la case « Rentrée des classes » passe à « Commandée ✓ » sur la frise et les compteurs (commandes obligatoires / validées) se mettent à jour. Corrigé au passage : la répartition Kit/PLV du récapitulatif de commande comptait tout dans PLV (décalage d'index sur les cartes) - les cartes ont désormais des id dédiés (`kit-card`, `plv-card`) et `tot()`/`creerSupport()` s'appuient sur eux. SW `pm-proto-v7`.
 - ✅ v1.6 : export du rendu personnalisé (écran Personnaliser) en PNG, JPEG ou PDF. Reste 100 % statique : le canvas déjà utilisé pour composer le visuel (fonds perdus, traits de coupe) sert de base commune ; PNG/JPEG via `canvas.toBlob`/`toDataURL` (aucune dépendance) ; PDF via jsPDF chargé en CDN (cdnjs, `defer`, mis en cache par le SW comme SheetJS), au format réel en mm (A2 420x594, A5 148x210, vitrophanie 1000x500) pour un rendu prêt imprimeur. Repli automatique en PNG si jsPDF n'est pas encore en cache (hors ligne avant première visite). SW `pm-proto-v6`.
 - ✅ v1.0 : 4 écrans, responsive, PWA installable, hors ligne, icônes, manifest, README.
 - ✅ v1.1 : URL de publication dans README et CDC.

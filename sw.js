@@ -1,5 +1,5 @@
 // Service worker - prototype Plateforme Marketing Sport 2000
-const VERSION = 'pm-proto-v6';
+const VERSION = 'pm-proto-v7';
 const SHELL = ['./', './index.html', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-180.png'];
 
