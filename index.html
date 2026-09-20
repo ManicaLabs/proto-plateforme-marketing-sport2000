@@ -221,6 +221,20 @@ table.tbl tr:nth-child(even) td{background:var(--fond)}
 .affiche .accroche{font-family:'Barlow Condensed';font-weight:700;font-size:20px;color:var(--rouge);margin-top:6px;text-transform:uppercase;letter-spacing:.02em}
 .compteur{font-size:11px;color:var(--gris);text-align:right;margin-top:-8px;margin-bottom:10px}
 @media(max-width:760px){.admin-grid{grid-template-columns:1fr}.row2{grid-template-columns:1fr}.affiche.vitro{width:100%}}
+/* ===== Editeur de gabarit ===== */
+.gab-editor-grid{display:grid;grid-template-columns:1fr 300px;gap:16px;margin-top:14px;align-items:start}
+#gab-canvas{position:relative;width:100%;background:#fff no-repeat center/cover;border:1px solid var(--ligne);overflow:hidden;touch-action:none}
+.gab-el{position:absolute;box-sizing:border-box;border:1px dashed transparent;cursor:move;overflow:hidden;display:flex;line-height:1.15;padding:1px}
+.gab-el.sel{border-color:var(--rouge)}
+.gab-el.photo-vide{align-items:center;justify-content:center;background:#EDEBE8;color:#B9B6B1;font-size:10.5px;font-weight:600}
+.gab-handle{position:absolute;right:-6px;bottom:-6px;width:13px;height:13px;background:var(--rouge);border:2px solid #fff;border-radius:3px;cursor:se-resize;z-index:2}
+.gab-props-empty{font-size:12.5px;color:var(--gris)}
+@media(max-width:760px){.gab-editor-grid{grid-template-columns:1fr}}
+/* rendu dynamique d'un gabarit personnalise dans Personnaliser */
+#affiche-custom{position:absolute;inset:0;display:none;background:#fff no-repeat center/cover}
+.affiche.custom-active .creat,.affiche.custom-active .zone{display:none}
+.affiche.custom-active #affiche-custom{display:block}
+.gab-render-el{position:absolute;box-sizing:border-box;overflow:hidden;line-height:1.15}
 /* ===== Boutique objets publicitaires ===== */
 .filtres{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
 .filtres button{border:1px solid var(--ligne);background:#fff;border-radius:99px;padding:6px 13px;font-size:12.5px;font-weight:600;color:var(--encre);cursor:pointer;font-family:'Inter'}
@@ -623,6 +637,7 @@ body.menu-open{overflow:hidden}
             <div class="l1" id="p-hor">9h30 – 19h30 non-stop</div>
             <div class="l2" id="p-rs">@sport2000echirolles</div>
           </div>
+          <div id="affiche-custom"></div>
         </div>
         <div class="perso-actions">
           <select id="f-format" aria-label="Format d'export" style="flex:0 0 96px">
@@ -744,38 +759,35 @@ body.menu-open{overflow:hidden}
 
   <!-- --- Gabarits --- -->
   <div class="sous" id="sous-gab">
-    <div class="admin-grid">
-      <div class="card form">
-        <h3>Nouveau gabarit d'impression locale</h3>
-        <div class="s">Vous déposez la création de votre agence et vous décidez des zones que les magasins peuvent personnaliser. Tout le reste est verrouillé.</div>
-        <div class="field"><label>Nom du gabarit</label><input id="g-nom" placeholder="ex. Affiche Portes ouvertes A2"></div>
-        <div class="row2">
-          <div class="field"><label>Format</label><select id="g-fmt"><option value="a2">A2 portrait</option><option value="a5">A5 portrait</option><option value="vitro">Vitrophanie 100 × 50</option></select></div>
-          <div class="field"><label>Fichier de création (agence)</label><input type="file" accept=".pdf,.ai,.indd,image/*"></div>
-        </div>
-        <label style="font-size:12px;font-weight:600">Zones ouvertes à la personnalisation</label>
-        <div class="checks" id="g-zones">
-          <label class="on"><input type="checkbox" checked value="remise"> Pourcentage de remise</label>
-          <label class="on"><input type="checkbox" checked value="date"> Date</label>
-          <label class="on"><input type="checkbox" checked value="adresse"> Adresse</label>
-          <label class="on"><input type="checkbox" checked value="horaires"> Horaires</label>
-          <label><input type="checkbox" value="reseaux"> Réseaux sociaux</label>
-          <label><input type="checkbox" value="photo"> Photo locale</label>
-          <label><input type="checkbox" value="accroche"> Accroche locale</label>
-        </div>
-        <div class="row2">
-          <div class="field"><label>Police imposée</label><select><option>Barlow Condensed (charte)</option><option>Inter (charte)</option></select></div>
-          <div class="field"><label>Validation</label><select><option>BAT validé par la centrale</option><option>Libre (sans validation)</option></select></div>
-        </div>
-        <button class="btn rouge" onclick="creerGabarit()">Publier le gabarit</button>
-        <div class="liste-admin" id="g-liste"><div><span>Affiche événement A2</span><span>7 zones · 12 magasins l'utilisent</span></div><div><span>Flyer promo A5</span><span>5 zones · 4 magasins</span></div><div><span>Vitrophanie 100 × 50</span><span>4 zones · 2 magasins</span></div></div>
+    <div class="card form">
+      <h3>Éditeur de gabarit</h3>
+      <div class="s">Chargez un fond, posez des rectangles, des cercles et des zones (texte ou photo), réglez leur police, taille et couleur. Publié, le gabarit devient sélectionnable dans Personnaliser avec un rendu et un export fidèles à ce que vous composez ici.</div>
+      <div class="row2">
+        <div class="field"><label>Nom du gabarit</label><input id="gab-nom" placeholder="ex. Affiche Portes ouvertes A2"></div>
+        <div class="field"><label>Format</label><select id="gab-fmt" onchange="gabAppliquerFormat()"><option value="a2">A2 portrait</option><option value="a5">A5 portrait</option><option value="vitro">Vitrophanie 100 × 50</option></select></div>
       </div>
-      <div class="card form">
-        <h3>Ce que voit le magasin</h3>
-        <div class="s">Le gabarit publié apparaît dans la liste de l'écran Personnaliser, avec uniquement les zones que vous avez ouvertes.</div>
-        <div class="lockinfo">🔒 Les zones non cochées restent figées : visuel de campagne, marque, mécanique de l'offre, typographies. Le magasin ne peut ni les déplacer ni les modifier.</div>
-        <div class="lockinfo" style="margin-top:8px">✓ Aucune intervention de Manica Labs : la publication d'un gabarit est immédiate. L'accompagnement proposé en année 1 porte uniquement sur la reprise de vos ~200 gabarits existants, à votre rythme.</div>
-        <button class="btn ghost" style="margin-top:14px" onclick="go('perso')">Ouvrir l'écran Personnaliser du magasin</button>
+      <div class="field"><label>Fond (image)</label><input type="file" id="gab-bg-input" accept="image/*" onchange="gabChargerFond(this)"></div>
+      <div class="checks" style="margin-top:2px">
+        <button class="btn ghost" type="button" onclick="gabAjouterElement('rect')">+ Rectangle</button>
+        <button class="btn ghost" type="button" onclick="gabAjouterElement('cercle')">+ Cercle</button>
+        <button class="btn ghost" type="button" onclick="gabAjouterElement('zone')">+ Zone</button>
+        <button class="btn ghost" type="button" onclick="gabSupprimerSelection()">Supprimer l'élément sélectionné</button>
+      </div>
+    </div>
+    <div class="gab-editor-grid">
+      <div class="card" style="padding:16px">
+        <div id="gab-canvas"></div>
+        <div class="s" style="margin-top:10px">Cliquez un élément pour le sélectionner, glissez pour le déplacer, tirez la poignée rouge pour le redimensionner.</div>
+        <button class="btn rouge" style="margin-top:12px;width:auto" onclick="publierGabaritCustom()">Publier le gabarit</button>
+      </div>
+      <div>
+        <div class="card form" id="gab-props" style="margin-bottom:14px"></div>
+        <div class="card form">
+          <h3>Gabarits publiés</h3>
+          <div class="s">Historiques (repris à votre rythme, non modifiables ici) et gabarits créés avec l'éditeur.</div>
+          <div class="liste-admin" id="g-liste"><div><span>Affiche événement A2</span><span>7 zones · 12 magasins l'utilisent · historique</span></div><div><span>Flyer promo A5</span><span>5 zones · 4 magasins · historique</span></div><div><span>Vitrophanie 100 × 50</span><span>4 zones · 2 magasins · historique</span></div></div>
+          <div class="lockinfo" style="margin-top:10px">✓ Aucune intervention de Manica Labs : la publication d'un gabarit est immédiate. Chaque personnalisation reste soumise au BAT centrale avant impression.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1072,12 +1084,135 @@ function creerObjet(){
   p.innerHTML='<div class="vis">'+cat.toUpperCase().slice(0,9)+'</div><b>'+nom+'</b><div class="meta"><span class="chip '+circ+'">'+(circ==='ent'?'Entrepôt central':'Direct fournisseur')+'</span><span class="chip gris">'+cond+'</span>'+(rep?'<span class="chip loc">Repiquage possible</span>':'')+'<span class="chip ok">Nouveau</span></div><div class="desc">Fiche créée par la centrale depuis l\'espace d\'administration.</div><div class="bas"><span class="pu"><b>'+prix.toFixed(2).replace('.',',')+' €</b> / unité</span><div class="qty"><button onclick="qb(this,-1)">−</button><input value="0" data-pu="'+prix+'" data-circ="'+circ+'" onchange="totB()"><button onclick="qb(this,1)">+</button></div></div>';
   g.prepend(p); toast('Objet « '+nom+' » ajouté à la boutique'); document.getElementById('a2-nom').value='';
 }
-function creerGabarit(){
-  const nom=document.getElementById('g-nom').value.trim()||'Nouveau gabarit'; const fmt=document.getElementById('g-fmt').value;
-  const zones=[...document.querySelectorAll('#g-zones input:checked')].map(i=>i.value);
-  const l=document.getElementById('g-liste'); const d=document.createElement('div'); d.innerHTML='<span>'+nom+'</span><span>'+zones.length+' zones · publié à l\'instant</span>'; l.prepend(d);
-  const sel=document.getElementById('f-gab'); const o=document.createElement('option'); o.value=fmt; o.text=nom; o.dataset.zones=zones.join(','); sel.add(o); sel.value=nom; sel.selectedIndex=sel.options.length-1; gabarit();
-  toast('Gabarit « '+nom+' » publié : visible par les magasins'); document.getElementById('g-nom').value='';
+// ---------- espace centrale : editeur visuel de gabarit ----------
+const GAB_REF_WIDTH={a2:420,a5:300,vitro:460};
+const GAB_CANVAS_PX={a2:1000,a5:1000,vitro:1400};
+const GAB_CHAMP_LABEL={remise:'Pourcentage de remise',date:"Date de l'événement",adresse:'Adresse du magasin',horaires:'Horaires',reseaux:'Réseaux sociaux',accroche:'Accroche locale',photo:'Photo locale',libre:'Texte libre (fixe)'};
+const GAB_SAMPLE={remise:'-30 %',date:'Samedi 18 septembre',adresse:'14 av. de Grugliasco, Échirolles',horaires:'9h30 - 19h30',reseaux:'@votremagasin',accroche:'Votre accroche locale ici'};
+const GABARITS_CUSTOM=[];
+let GAB_SEQ=0;
+let gabState={fond:null,elements:[],selected:null};
+let gabDrag=null;
+function gabAppliquerFormat(){
+  const fmt=document.getElementById('gab-fmt').value, mm=MM_FORMAT[fmt], c=document.getElementById('gab-canvas');
+  c.style.width='min('+GAB_REF_WIDTH[fmt]+'px, 100%)'; c.style.aspectRatio=mm[0]+'/'+mm[1];
+}
+function gabChargerFond(inp){
+  const f=inp.files&&inp.files[0]; if(!f)return;
+  const r=new FileReader(); r.onload=e=>{gabState.fond=e.target.result; gabRenderCanvas();}; r.readAsDataURL(f);
+}
+function gabAjouterElement(type){
+  const id='el'+(++GAB_SEQ); const n=gabState.elements.length;
+  const el={id,type,x:10+(n*9)%60,y:10+(n*13)%55,w:35,h:type==='zone'?15:20};
+  if(type==='rect'){el.couleur='#D8121F';el.opacite=1;}
+  else if(type==='cercle'){el.couleur='#17181C';el.opacite=1;}
+  else {el.champ='accroche';el.texte='Votre texte';el.police='Inter';el.taille=16;el.couleur='#17181C';el.align='left';el.gras=false;}
+  gabState.elements.push(el); gabSelectionner(id);
+}
+function gabSupprimerSelection(){
+  if(!gabState.selected)return;
+  gabState.elements=gabState.elements.filter(e=>e.id!==gabState.selected); gabState.selected=null;
+  gabRenderCanvas(); gabRenderProps();
+}
+function gabSelectionner(id){ gabState.selected=id; gabRenderCanvas(); gabRenderProps(); }
+function gabValeurAffichee(el){
+  if(el.champ==='libre')return el.texte||'';
+  if(el.champ==='photo')return '';
+  return GAB_SAMPLE[el.champ]||'';
+}
+function gabRenderCanvas(){
+  const host=document.getElementById('gab-canvas');
+  host.style.backgroundImage=gabState.fond?'url('+gabState.fond+')':'none';
+  host.innerHTML='';
+  gabState.elements.forEach(el=>{
+    const d=document.createElement('div'); d.className='gab-el'+(el.id===gabState.selected?' sel':'');
+    d.style.left=el.x+'%'; d.style.top=el.y+'%'; d.style.width=el.w+'%'; d.style.height=el.h+'%';
+    if(el.type==='rect'){ d.style.background=el.couleur; d.style.opacity=el.opacite; }
+    else if(el.type==='cercle'){ d.style.background=el.couleur; d.style.opacity=el.opacite; d.style.borderRadius='50%'; }
+    else if(el.champ==='photo'){ d.classList.add('photo-vide'); d.textContent='Photo locale'; }
+    else {
+      d.style.fontFamily=el.police==='Barlow Condensed'?"'Barlow Condensed',sans-serif":"'Inter',sans-serif";
+      d.style.fontSize=el.taille+'px'; d.style.color=el.couleur; d.style.fontWeight=el.gras?'700':'400';
+      d.style.alignItems='flex-start'; d.style.textAlign=el.align;
+      d.style.justifyContent=el.align==='center'?'center':el.align==='right'?'flex-end':'flex-start';
+      d.textContent=gabValeurAffichee(el);
+    }
+    d.dataset.id=el.id;
+    d.addEventListener('pointerdown',gabStartDrag);
+    const h=document.createElement('span'); h.className='gab-handle'; h.addEventListener('pointerdown',gabStartResize);
+    d.appendChild(h); host.appendChild(d);
+  });
+}
+function gabRenderProps(){
+  const host=document.getElementById('gab-props'), el=gabState.elements.find(e=>e.id===gabState.selected);
+  if(!el){ host.innerHTML='<h3>Propriétés</h3><div class="gab-props-empty">Sélectionnez un élément du gabarit, ou ajoutez-en un ci-contre.</div>'; return; }
+  if(el.type==='zone'){
+    host.innerHTML='<h3>Zone</h3>'+
+      '<div class="field"><label>Donnée liée</label><select id="gp-champ">'+
+        Object.entries(GAB_CHAMP_LABEL).map(([k,l])=>'<option value="'+k+'"'+(el.champ===k?' selected':'')+'>'+l+'</option>').join('')+
+      '</select></div>'+
+      (el.champ==='libre'?'<div class="field"><label>Texte</label><input id="gp-texte" value="'+(el.texte||'').replace(/"/g,'&quot;')+'"></div>':'')+
+      (el.champ!=='photo'?(
+        '<div class="row2">'+
+          '<div class="field"><label>Police</label><select id="gp-police"><option'+(el.police==='Inter'?' selected':'')+'>Inter</option><option'+(el.police==='Barlow Condensed'?' selected':'')+'>Barlow Condensed</option></select></div>'+
+          '<div class="field"><label>Taille (px)</label><input id="gp-taille" type="number" value="'+el.taille+'" min="8" max="80"></div>'+
+        '</div>'+
+        '<div class="row2">'+
+          '<div class="field"><label>Couleur</label><input id="gp-couleur" type="color" value="'+el.couleur+'" style="height:36px"></div>'+
+          '<div class="field"><label>Alignement</label><select id="gp-align"><option value="left"'+(el.align==='left'?' selected':'')+'>Gauche</option><option value="center"'+(el.align==='center'?' selected':'')+'>Centre</option><option value="right"'+(el.align==='right'?' selected':'')+'>Droite</option></select></div>'+
+        '</div>'+
+        '<div class="checks"><label class="'+(el.gras?'on':'')+'"><input type="checkbox" id="gp-gras"'+(el.gras?' checked':'')+'> Gras</label></div>'
+      ):'<div class="s">La zone affichera la photo envoyée par le magasin dans Personnaliser (ou un espace réservé si aucune photo).</div>');
+  } else {
+    host.innerHTML='<h3>'+(el.type==='rect'?'Rectangle':'Cercle')+'</h3>'+
+      '<div class="field"><label>Couleur</label><input id="gp-couleur" type="color" value="'+el.couleur+'" style="height:36px"></div>'+
+      '<div class="field"><label>Opacité</label><input id="gp-opacite" type="range" min="10" max="100" value="'+Math.round(el.opacite*100)+'"></div>';
+  }
+  host.innerHTML+='<button class="btn ghost" style="margin-top:10px;width:100%" onclick="gabSupprimerSelection()">Supprimer cet élément</button>';
+  const bind=(elId,evt,fn)=>{const n=document.getElementById(elId); if(n)n.addEventListener(evt,fn);};
+  bind('gp-champ','change',e=>{el.champ=e.target.value; if(el.champ==='libre'&&!el.texte)el.texte='Votre texte'; gabRenderCanvas(); gabRenderProps();});
+  bind('gp-texte','input',e=>{el.texte=e.target.value; gabRenderCanvas();});
+  bind('gp-police','change',e=>{el.police=e.target.value; gabRenderCanvas();});
+  bind('gp-taille','input',e=>{el.taille=parseInt(e.target.value||16); gabRenderCanvas();});
+  bind('gp-couleur','input',e=>{el.couleur=e.target.value; gabRenderCanvas();});
+  bind('gp-align','change',e=>{el.align=e.target.value; gabRenderCanvas();});
+  bind('gp-gras','change',e=>{el.gras=e.target.checked; e.target.closest('label').classList.toggle('on',el.gras); gabRenderCanvas();});
+  bind('gp-opacite','input',e=>{el.opacite=parseInt(e.target.value)/100; gabRenderCanvas();});
+}
+function gabStartDrag(e){
+  if(e.target.classList.contains('gab-handle'))return;
+  e.preventDefault(); e.stopPropagation();
+  const id=e.currentTarget.dataset.id; gabSelectionner(id);
+  const el=gabState.elements.find(x=>x.id===id), rect=document.getElementById('gab-canvas').getBoundingClientRect();
+  gabDrag={id,mode:'move',startX:e.clientX,startY:e.clientY,origX:el.x,origY:el.y,rectW:rect.width,rectH:rect.height};
+  window.addEventListener('pointermove',gabOnDrag); window.addEventListener('pointerup',gabEndDrag);
+}
+function gabStartResize(e){
+  e.preventDefault(); e.stopPropagation();
+  const id=e.currentTarget.parentElement.dataset.id; gabSelectionner(id);
+  const el=gabState.elements.find(x=>x.id===id), rect=document.getElementById('gab-canvas').getBoundingClientRect();
+  gabDrag={id,mode:'resize',startX:e.clientX,startY:e.clientY,origW:el.w,origH:el.h,rectW:rect.width,rectH:rect.height};
+  window.addEventListener('pointermove',gabOnDrag); window.addEventListener('pointerup',gabEndDrag);
+}
+function gabOnDrag(e){
+  if(!gabDrag)return; const el=gabState.elements.find(x=>x.id===gabDrag.id); if(!el)return;
+  const dxPct=(e.clientX-gabDrag.startX)/gabDrag.rectW*100, dyPct=(e.clientY-gabDrag.startY)/gabDrag.rectH*100;
+  if(gabDrag.mode==='move'){ el.x=Math.max(0,Math.min(100-el.w,gabDrag.origX+dxPct)); el.y=Math.max(0,Math.min(100-el.h,gabDrag.origY+dyPct)); }
+  else { el.w=Math.max(4,Math.min(100-el.x,gabDrag.origW+dxPct)); el.h=Math.max(4,Math.min(100-el.y,gabDrag.origH+dyPct)); }
+  gabRenderCanvas();
+}
+function gabEndDrag(){ gabDrag=null; window.removeEventListener('pointermove',gabOnDrag); window.removeEventListener('pointerup',gabEndDrag); }
+function publierGabaritCustom(){
+  if(!gabState.elements.length){ toast('Ajoutez au moins un élément avant de publier'); return; }
+  const nom=document.getElementById('gab-nom').value.trim()||'Nouveau gabarit', fmt=document.getElementById('gab-fmt').value;
+  const id='gc'+(++GAB_SEQ);
+  const g={id,nom,format:fmt,fond:gabState.fond,elements:JSON.parse(JSON.stringify(gabState.elements))};
+  GABARITS_CUSTOM.push(g);
+  const sel=document.getElementById('f-gab'); const o=document.createElement('option'); o.text=nom; o.dataset.custom='1'; o.dataset.gid=id; sel.add(o); sel.value=nom; sel.selectedIndex=sel.options.length-1; gabarit();
+  const l=document.getElementById('g-liste'); const d=document.createElement('div'); d.innerHTML='<span>'+nom+'</span><span>'+g.elements.length+' éléments · gabarit personnalisé</span>'; l.prepend(d);
+  toast('Gabarit « '+nom+' » publié : disponible dans Personnaliser');
+  document.getElementById('gab-nom').value=''; document.getElementById('gab-bg-input').value='';
+  gabState={fond:null,elements:[],selected:null}; gabRenderCanvas(); gabRenderProps();
 }
 
 // ---------- espace centrale : operations, utilisateurs, magasins ----------
@@ -1118,18 +1253,78 @@ function initReferentiels(){
 const ZONES_DEF={a2:['remise','date','adresse','horaires','reseaux','photo','accroche'],a5:['remise','date','adresse','horaires','accroche'],vitro:['remise','date','horaires','accroche']};
 const CHAMP_ZONE={remise:'f-promo',date:'f-date',adresse:'f-adr',horaires:'f-hor',reseaux:'f-rs',photo:'f-photo',accroche:'f-acc'};
 const PREV_ZONE={date:'p-date',adresse:'p-adr',horaires:'p-hor',reseaux:'p-rs',photo:'p-photo',accroche:'p-acc'};
+function champValeur(champ){
+  switch(champ){
+    case 'remise': return document.getElementById('f-promo').value;
+    case 'date': return document.getElementById('f-date').value;
+    case 'adresse': return document.getElementById('f-adr').value;
+    case 'horaires': return document.getElementById('f-hor').value;
+    case 'reseaux': return document.getElementById('f-rs').value;
+    case 'accroche': return document.getElementById('f-acc').value;
+    default: return '';
+  }
+}
+let PHOTO_DATAURL=null;
+function renderGabaritCustom(g){
+  const host=document.getElementById('affiche-custom'); if(!host)return;
+  host.style.backgroundImage=g.fond?'url('+g.fond+')':'none';
+  host.innerHTML='';
+  g.elements.forEach(el=>{
+    const d=document.createElement('div'); d.className='gab-render-el';
+    d.style.left=el.x+'%'; d.style.top=el.y+'%'; d.style.width=el.w+'%'; d.style.height=el.h+'%';
+    if(el.type==='rect'){ d.style.background=el.couleur; d.style.opacity=el.opacite; }
+    else if(el.type==='cercle'){ d.style.background=el.couleur; d.style.opacity=el.opacite; d.style.borderRadius='50%'; }
+    else if(el.champ==='photo'){
+      if(PHOTO_DATAURL){ d.style.background='url('+PHOTO_DATAURL+') center/cover no-repeat'; }
+      else { d.style.background='#EDEBE8'; d.style.display='flex'; d.style.alignItems='center'; d.style.justifyContent='center'; d.style.color='#B9B6B1'; d.style.fontSize='11px'; d.style.fontWeight='600'; d.textContent='Photo locale'; }
+    } else {
+      d.style.fontFamily=el.police==='Barlow Condensed'?"'Barlow Condensed',sans-serif":"'Inter',sans-serif";
+      d.style.fontSize=el.taille+'px'; d.style.color=el.couleur; d.style.fontWeight=el.gras?'700':'400';
+      d.style.display='flex'; d.style.alignItems='flex-start'; d.style.textAlign=el.align;
+      d.style.justifyContent=el.align==='center'?'center':el.align==='right'?'flex-end':'flex-start';
+      d.textContent=el.champ==='libre'?(el.texte||''):champValeur(el.champ);
+    }
+    host.appendChild(d);
+  });
+}
 function gabarit(){
-  const sel=document.getElementById('f-gab'); const opt=sel.options[sel.selectedIndex]; const fmt=opt.value;
+  const sel=document.getElementById('f-gab'); const opt=sel.options[sel.selectedIndex]; const aff=document.getElementById('affiche');
+  if(opt.dataset.custom==='1'){
+    const g=GABARITS_CUSTOM.find(x=>x.id===opt.dataset.gid); if(!g)return;
+    aff.className='affiche custom-active'+(g.format==='a5'?' a5':g.format==='vitro'?' vitro':'');
+    aff.style.aspectRatio=MM_FORMAT[g.format][0]+'/'+MM_FORMAT[g.format][1];
+    document.getElementById('p-gab-tag').textContent='Gabarit · '+opt.text;
+    const champs=new Set(g.elements.filter(e=>e.type==='zone'&&e.champ!=='libre').map(e=>e.champ));
+    Object.entries(CHAMP_ZONE).forEach(([z,id])=>{const el=document.getElementById(id); if(el&&el.closest('.field')) el.closest('.field').style.display=champs.has(z)?'':'none';});
+    renderGabaritCustom(g);
+    return;
+  }
+  aff.style.aspectRatio='';
+  const fmt=opt.value;
   const zones=opt.dataset.zones?opt.dataset.zones.split(','):ZONES_DEF[fmt]||ZONES_DEF.a2;
-  const aff=document.getElementById('affiche'); aff.className='affiche'+(fmt==='a5'?' a5':fmt==='vitro'?' vitro':'');
+  aff.className='affiche'+(fmt==='a5'?' a5':fmt==='vitro'?' vitro':'');
   document.getElementById('p-gab-tag').textContent='Gabarit · '+opt.text;
   Object.entries(CHAMP_ZONE).forEach(([z,id])=>{const el=document.getElementById(id); if(el&&el.closest('.field')) el.closest('.field').style.display=zones.includes(z)?'':'none';});
   Object.entries(PREV_ZONE).forEach(([z,id])=>{const el=document.getElementById(id); if(el) el.style.display=zones.includes(z)?'':'none';});
   document.getElementById('p-promo').style.display=zones.includes('remise')?'':'none';
 }
-function photo(inp){const f=inp.files&&inp.files[0]; if(!f)return; const r=new FileReader(); r.onload=e=>{const p=document.getElementById('p-photo'); p.style.backgroundImage='url('+e.target.result+')'; p.textContent='';}; r.readAsDataURL(f);}
+function photo(inp){
+  const f=inp.files&&inp.files[0]; if(!f)return; const r=new FileReader();
+  r.onload=e=>{
+    PHOTO_DATAURL=e.target.result;
+    const p=document.getElementById('p-photo'); p.style.backgroundImage='url('+e.target.result+')'; p.textContent='';
+    const sel=document.getElementById('f-gab'); const opt=sel.options[sel.selectedIndex];
+    if(opt.dataset.custom==='1'){ const g=GABARITS_CUSTOM.find(x=>x.id===opt.dataset.gid); if(g)renderGabaritCustom(g); }
+  };
+  r.readAsDataURL(f);
+}
 const MM_FORMAT={a2:[420,594],a5:[148,210],vitro:[1000,500]};
-function composerRendu(){
+function chargerImage(src){ return new Promise(res=>{const img=new Image(); img.onload=()=>res(img); img.src=src;}); }
+function traitsDeCoupe(x,c,B){
+  x.strokeStyle='#000'; x.lineWidth=2; [[B,0,B,B-10],[0,B,B-10,B],[c.width-B,0,c.width-B,B-10],[c.width,B,c.width-B+10,B],[B,c.height,B,c.height-B+10],[0,c.height-B,B-10,c.height-B],[c.width-B,c.height,c.width-B,c.height-B+10],[c.width,c.height-B,c.width-B+10,c.height-B]].forEach(([a,b,d,e])=>{x.beginPath();x.moveTo(a,b);x.lineTo(d,e);x.stroke();});
+  x.fillStyle='#888'; x.font=(c.width*0.014)+'px Arial'; x.fillText('BAT généré par la plateforme · fonds perdus 5 mm · traits de coupe · quadri · '+new Date().toLocaleDateString('fr-FR'),B+30,c.height-B+28);
+}
+function composerRenduFixe(){
   const c=document.createElement('canvas'); const fmt=document.getElementById('affiche').classList.contains('vitro')?'vitro':document.getElementById('affiche').classList.contains('a5')?'a5':'a2';
   c.width=fmt==='vitro'?1400:1000; c.height=fmt==='vitro'?700:1414; const x=c.getContext('2d'); const B=40; // fonds perdus
   x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height);
@@ -1141,20 +1336,50 @@ function composerRendu(){
   let y=hc+70; x.fillStyle='#17181C';
   const lignes=[['p-acc','bold '+(c.width*0.034)+'px Arial','#D8121F'],['p-date','bold '+(c.width*0.03)+'px Arial','#17181C'],['p-adr',(c.width*0.024)+'px Arial','#555'],['p-hor',(c.width*0.024)+'px Arial','#555'],['p-rs','bold '+(c.width*0.024)+'px Arial','#17181C']];
   lignes.forEach(([id,font,col])=>{const el=document.getElementById(id); if(!el||el.style.display==='none')return; x.font=font; x.fillStyle=col; x.fillText(el.textContent,B+30,y); y+=c.width*0.05;});
-  // traits de coupe
-  x.strokeStyle='#000'; x.lineWidth=2; [[B,0,B,B-10],[0,B,B-10,B],[c.width-B,0,c.width-B,B-10],[c.width,B,c.width-B+10,B],[B,c.height,B,c.height-B+10],[0,c.height-B,B-10,c.height-B],[c.width-B,c.height,c.width-B,c.height-B+10],[c.width,c.height-B,c.width-B+10,c.height-B]].forEach(([a,b,d,e])=>{x.beginPath();x.moveTo(a,b);x.lineTo(d,e);x.stroke();});
-  x.fillStyle='#888'; x.font=(c.width*0.014)+'px Arial'; x.fillText('BAT généré par la plateforme · fonds perdus 5 mm · traits de coupe · quadri · '+new Date().toLocaleDateString('fr-FR'),B+30,c.height-B+28);
-  return {canvas:c, fmt};
+  traitsDeCoupe(x,c,B);
+  return Promise.resolve({canvas:c, fmt, nom:'Anniversaire 10 ans'});
+}
+async function composerRenduCustom(g){
+  const dims=g.format==='vitro'?[1400,700]:[1000,1414];
+  const c=document.createElement('canvas'); c.width=dims[0]; c.height=dims[1]; const x=c.getContext('2d'); const B=40;
+  x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height);
+  if(g.fond){ const img=await chargerImage(g.fond); x.drawImage(img,0,0,c.width,c.height); }
+  const scaleFont=GAB_CANVAS_PX[g.format]/GAB_REF_WIDTH[g.format];
+  for(const el of g.elements){
+    const ex=el.x/100*c.width, ey=el.y/100*c.height, ew=el.w/100*c.width, eh=el.h/100*c.height;
+    if(el.type==='rect'){ x.globalAlpha=el.opacite; x.fillStyle=el.couleur; x.fillRect(ex,ey,ew,eh); x.globalAlpha=1; }
+    else if(el.type==='cercle'){ x.globalAlpha=el.opacite; x.fillStyle=el.couleur; x.beginPath(); x.ellipse(ex+ew/2,ey+eh/2,ew/2,eh/2,0,0,Math.PI*2); x.fill(); x.globalAlpha=1; }
+    else if(el.champ==='photo'){
+      if(PHOTO_DATAURL){
+        const img=await chargerImage(PHOTO_DATAURL); x.save(); x.beginPath(); x.rect(ex,ey,ew,eh); x.clip();
+        const s=Math.max(ew/img.width,eh/img.height), iw=img.width*s, ih=img.height*s;
+        x.drawImage(img, ex+(ew-iw)/2, ey+(eh-ih)/2, iw, ih); x.restore();
+      } else { x.fillStyle='#EDEBE8'; x.fillRect(ex,ey,ew,eh); }
+    } else {
+      const txt=el.champ==='libre'?(el.texte||''):champValeur(el.champ);
+      x.fillStyle=el.couleur; x.font=(el.gras?'bold ':'')+Math.round(el.taille*scaleFont)+'px Arial';
+      x.textAlign=el.align==='center'?'center':el.align==='right'?'right':'left'; x.textBaseline='top';
+      const tx=el.align==='center'?ex+ew/2:el.align==='right'?ex+ew:ex;
+      x.fillText(txt, tx, ey+2);
+    }
+  }
+  traitsDeCoupe(x,c,B);
+  return {canvas:c, fmt:g.format, nom:g.nom};
+}
+function composerRendu(){
+  const sel=document.getElementById('f-gab'); const opt=sel.options[sel.selectedIndex];
+  if(opt.dataset.custom==='1'){ const g=GABARITS_CUSTOM.find(x=>x.id===opt.dataset.gid); if(g)return composerRenduCustom(g); }
+  return composerRenduFixe();
 }
 function telechargerImage(c,format,base){
   const mime=format==='jpeg'?'image/jpeg':'image/png', ext=format==='jpeg'?'jpg':'png';
   const a=document.createElement('a'); a.download=base+'.'+ext; a.href=c.toDataURL(mime, format==='jpeg'?0.92:undefined); a.click();
   toast('Fichier '+ext.toUpperCase()+' généré (fonds perdus, traits de coupe)');
 }
-function exportBAT(){
+async function exportBAT(){
   const format=document.getElementById('f-format').value;
-  const {canvas:c, fmt}=composerRendu();
-  const base='BAT_Anniversaire_10_ans_'+fmt.toUpperCase();
+  const {canvas:c, fmt, nom}=await composerRendu();
+  const base='BAT_'+nom.replace(/[^a-z0-9]+/gi,'_');
   if(format==='pdf'){
     if(!window.jspdf){ toast('PDF indisponible hors ligne (bibliothèque pas encore en cache) - export PNG à la place'); telechargerImage(c,'png',base); return; }
     const mm=MM_FORMAT[fmt]; const {jsPDF}=window.jspdf;
@@ -1211,7 +1436,7 @@ function exporter(fmt){
   if(fmt==='xlsx'&&window.XLSX){ const ws=XLSX.utils.aoa_to_sheet([cols,...rows]); ws['!cols']=cols.map(c=>({wch:Math.max(12,c.length+2)})); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,PRESET==='transport'?'Plan de transport':'Extraction'); XLSX.writeFile(wb,nom+'.xlsx'); toast('Fichier Excel généré : '+nom+'.xlsx'); return; }
   const csv=[cols,...rows].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\n'); const b=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=nom+'.csv'; a.click(); toast('Fichier CSV généré : '+nom+'.csv'+(fmt==='xlsx'?' (Excel indisponible hors ligne)':''));
 }
-champsInit(); preset('repartition'); gabarit(); maj(); initReferentiels();
+champsInit(); preset('repartition'); gabarit(); maj(); initReferentiels(); gabAppliquerFormat(); gabRenderCanvas(); gabRenderProps();
 function maj(){
   document.getElementById('p-promo').textContent=document.getElementById('f-promo').value;
   const acc=document.getElementById('f-acc'); if(acc){document.getElementById('p-acc').textContent=acc.value; document.getElementById('f-acc-c').textContent=acc.value.length+' / 40';}
@@ -1219,6 +1444,8 @@ function maj(){
   document.getElementById('p-adr').textContent=document.getElementById('f-adr').value;
   document.getElementById('p-hor').textContent=document.getElementById('f-hor').value;
   document.getElementById('p-rs').textContent=document.getElementById('f-rs').value;
+  const sel=document.getElementById('f-gab'); const opt=sel.options[sel.selectedIndex];
+  if(opt&&opt.dataset.custom==='1'){ const g=GABARITS_CUSTOM.find(x=>x.id===opt.dataset.gid); if(g)renderGabaritCustom(g); }
 }
 function bat(){
   const s=document.getElementById('statut-bat');
