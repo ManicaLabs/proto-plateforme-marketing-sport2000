@@ -13,6 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <meta name="description" content="Prototype PWA de la plateforme collaborative marketing Sport 2000 - réponse AO Manica Labs">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -337,6 +338,7 @@ body.menu-open{overflow:hidden}
   .prix{margin-left:auto}
   .apercu-wrap{padding:14px}
   .perso-actions{flex-direction:column}
+  .perso-actions select{flex:0 0 auto;width:100%}
   .projet-head .btn{width:100%}
   .jalon .date{display:none}
   .bnav{display:flex}
@@ -604,6 +606,11 @@ body.menu-open{overflow:hidden}
           </div>
         </div>
         <div class="perso-actions">
+          <select id="f-format" aria-label="Format d'export" style="flex:0 0 96px">
+            <option value="png">PNG</option>
+            <option value="jpeg">JPEG</option>
+            <option value="pdf">PDF</option>
+          </select>
           <button class="btn ghost" onclick="exportBAT()">Télécharger le fichier prêt à imprimer</button>
           <button class="btn rouge" onclick="bat()">Envoyer en validation (BAT centrale)</button>
         </div>
@@ -919,7 +926,8 @@ function gabarit(){
   document.getElementById('p-promo').style.display=zones.includes('remise')?'':'none';
 }
 function photo(inp){const f=inp.files&&inp.files[0]; if(!f)return; const r=new FileReader(); r.onload=e=>{const p=document.getElementById('p-photo'); p.style.backgroundImage='url('+e.target.result+')'; p.textContent='';}; r.readAsDataURL(f);}
-function exportBAT(){
+const MM_FORMAT={a2:[420,594],a5:[148,210],vitro:[1000,500]};
+function composerRendu(){
   const c=document.createElement('canvas'); const fmt=document.getElementById('affiche').classList.contains('vitro')?'vitro':document.getElementById('affiche').classList.contains('a5')?'a5':'a2';
   c.width=fmt==='vitro'?1400:1000; c.height=fmt==='vitro'?700:1414; const x=c.getContext('2d'); const B=40; // fonds perdus
   x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height);
@@ -934,8 +942,27 @@ function exportBAT(){
   // traits de coupe
   x.strokeStyle='#000'; x.lineWidth=2; [[B,0,B,B-10],[0,B,B-10,B],[c.width-B,0,c.width-B,B-10],[c.width,B,c.width-B+10,B],[B,c.height,B,c.height-B+10],[0,c.height-B,B-10,c.height-B],[c.width-B,c.height,c.width-B,c.height-B+10],[c.width,c.height-B,c.width-B+10,c.height-B]].forEach(([a,b,d,e])=>{x.beginPath();x.moveTo(a,b);x.lineTo(d,e);x.stroke();});
   x.fillStyle='#888'; x.font=(c.width*0.014)+'px Arial'; x.fillText('BAT généré par la plateforme · fonds perdus 5 mm · traits de coupe · quadri · '+new Date().toLocaleDateString('fr-FR'),B+30,c.height-B+28);
-  const a=document.createElement('a'); a.download='BAT_Anniversaire_10_ans_'+fmt.toUpperCase()+'.png'; a.href=c.toDataURL('image/png'); a.click();
-  toast('Fichier prêt à imprimer généré (fonds perdus, traits de coupe)');
+  return {canvas:c, fmt};
+}
+function telechargerImage(c,format,base){
+  const mime=format==='jpeg'?'image/jpeg':'image/png', ext=format==='jpeg'?'jpg':'png';
+  const a=document.createElement('a'); a.download=base+'.'+ext; a.href=c.toDataURL(mime, format==='jpeg'?0.92:undefined); a.click();
+  toast('Fichier '+ext.toUpperCase()+' généré (fonds perdus, traits de coupe)');
+}
+function exportBAT(){
+  const format=document.getElementById('f-format').value;
+  const {canvas:c, fmt}=composerRendu();
+  const base='BAT_Anniversaire_10_ans_'+fmt.toUpperCase();
+  if(format==='pdf'){
+    if(!window.jspdf){ toast('PDF indisponible hors ligne (bibliothèque pas encore en cache) - export PNG à la place'); telechargerImage(c,'png',base); return; }
+    const mm=MM_FORMAT[fmt]; const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation: mm[0]>mm[1]?'landscape':'portrait', unit:'mm', format:mm});
+    doc.addImage(c.toDataURL('image/jpeg',0.92),'JPEG',0,0,mm[0],mm[1]);
+    doc.save(base+'.pdf');
+    toast('Fichier PDF généré, prêt pour l\'imprimeur ('+mm[0]+' × '+mm[1]+' mm, fonds perdus inclus)');
+    return;
+  }
+  telechargerImage(c,format,base);
 }
 
 // ---------- extracteur ----------
